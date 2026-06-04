@@ -405,12 +405,12 @@ function SidebarRow({
         className={
           "flex items-center justify-between gap-2 py-1.5 text-sm rounded-md px-2 -mx-2 " +
           (active
-            ? "bg-navy-950 text-white font-medium"
+            ? "bg-sand-100 text-navy-950 font-medium"
             : "text-navy-700 hover:bg-navy-50")
         }
       >
         <span>{label}</span>
-        <span className={"text-xs " + (active ? "text-sand-300" : "text-navy-500")}>
+        <span className={"text-xs " + (active ? "text-sand-700" : "text-navy-500")}>
           {count}
         </span>
       </Link>
