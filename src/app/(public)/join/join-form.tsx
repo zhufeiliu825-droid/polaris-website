@@ -12,19 +12,26 @@ import {
   Lightbulb,
 } from "lucide-react";
 import {
-  universities,
   degreeLevels,
-  yearOfStudy,
-  academicResults,
   sectors,
   programmes,
   referralSources,
   nationalities,
-  languages,
   careerStages,
   startTimings,
   experienceLevels,
 } from "@/lib/data/options";
+
+/**
+ * Dropdown options for the graduation-year field: the current year and the
+ * 20 preceding years, plus "Not graduated yet" for current students. Computed
+ * at module load so it tracks the real calendar (re-deploys roll it forward).
+ */
+const CURRENT_YEAR = new Date().getFullYear();
+const graduationYears = [
+  ...Array.from({ length: 21 }, (_, i) => String(CURRENT_YEAR - i)),
+  "Not graduated yet",
+];
 
 /**
  * Multi-step Join form.
@@ -53,10 +60,7 @@ type FormState = {
   degreeLevel: string;
   university: string;
   course: string;
-  yearOfStudy: string;
   graduationYear: string;
-  academicResult: string;
-  spokenLanguages: string[];
   experienceLevel: string;
   linkedin: string;
 
@@ -87,10 +91,7 @@ const initialState: FormState = {
   degreeLevel: "",
   university: "",
   course: "",
-  yearOfStudy: "",
   graduationYear: "",
-  academicResult: "",
-  spokenLanguages: [],
   experienceLevel: "",
   linkedin: "",
   targetEmployers: "",
@@ -365,12 +366,12 @@ export function JoinForm() {
               options={degreeLevels}
               onChange={(v) => update("degreeLevel", v)}
             />
-            <Select
+            <Field
               label="University"
               required
               value={state.university}
-              options={universities}
               onChange={(v) => update("university", v)}
+              placeholder="e.g. University of Warwick"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -381,35 +382,14 @@ export function JoinForm() {
               onChange={(v) => update("course", v)}
             />
             <Select
-              label="Year of study"
-              required
-              value={state.yearOfStudy}
-              options={yearOfStudy}
-              onChange={(v) => update("yearOfStudy", v)}
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Field
               label="Graduation year"
-              type="number"
+              required
               value={state.graduationYear}
+              options={graduationYears}
               onChange={(v) => update("graduationYear", v)}
-            />
-            <Select
-              label="Academic result"
-              value={state.academicResult}
-              options={academicResults}
-              onChange={(v) => update("academicResult", v)}
-              hint="Predicted is fine if you haven&apos;t graduated."
+              hint='Select "Not graduated yet" if you&apos;re still studying.'
             />
           </div>
-          <ChipGroup
-            label="Languages you speak"
-            hint="Mentioning Mandarin / Cantonese unlocks the Chinese-speaking job feed."
-            values={state.spokenLanguages}
-            options={languages}
-            onToggle={(v) => toggleInArray("spokenLanguages", v)}
-          />
           <Select
             label="Prior work experience"
             value={state.experienceLevel}
@@ -841,9 +821,7 @@ function countFilled(s: FormState): number {
     "degreeLevel",
     "university",
     "course",
-    "yearOfStudy",
     "graduationYear",
-    "academicResult",
     "experienceLevel",
     "linkedin",
     "targetEmployers",
@@ -856,7 +834,7 @@ function countFilled(s: FormState): number {
     if ((s[k] as string).trim()) n++;
   }
   // string[]
-  for (const k of ["targetSectors", "preferredLocations", "spokenLanguages"] as const) {
+  for (const k of ["targetSectors", "preferredLocations"] as const) {
     if ((s[k] as string[]).length) n++;
   }
   return n;
@@ -873,7 +851,7 @@ function stepIsValid(step: number, s: FormState): boolean {
   }
   if (step === 3) {
     return Boolean(
-      s.degreeLevel && s.university && s.course && s.yearOfStudy
+      s.degreeLevel && s.university && s.course && s.graduationYear
     );
   }
   return true; // step 2, 4 have no required fields, step 5 enforced via submit
