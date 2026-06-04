@@ -13,6 +13,7 @@ const CATEGORIES = [
   "Assessment",
   "Industry insights",
   "Working life",
+  "Other",
 ];
 
 type Search = Promise<{ category?: string }>;

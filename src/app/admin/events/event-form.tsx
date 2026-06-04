@@ -12,7 +12,7 @@ type EventInitial = {
   body: string;
   startsAt: string;
   endsAt: string;
-  format: "ONLINE" | "IN_PERSON" | "HYBRID";
+  format: "ONLINE" | "IN_PERSON";
   location: string;
   sector: string | null;
   capacity: number | null;
@@ -37,7 +37,7 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
     body: initial?.body ?? "",
     startsAt: initial?.startsAt?.slice(0, 16) ?? "",
     endsAt: initial?.endsAt?.slice(0, 16) ?? "",
-    format: (initial?.format ?? "ONLINE") as "ONLINE" | "IN_PERSON" | "HYBRID",
+    format: (initial?.format ?? "ONLINE") as "ONLINE" | "IN_PERSON",
     location: initial?.location ?? "",
     sector: initial?.sector ?? "",
     capacity: initial?.capacity ? String(initial.capacity) : "",
@@ -48,6 +48,16 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
   function set<K extends keyof typeof state>(k: K, v: (typeof state)[K]) {
     setState((s) => ({ ...s, [k]: v }));
   }
+
+  /**
+   * True when both start and end are filled in and the end is before
+   * (or equal to) the start. Displayed under the inputs and blocks the
+   * Save button so the user can't ship an event with broken timing.
+   */
+  const timeError =
+    state.startsAt && state.endsAt && state.endsAt <= state.startsAt
+      ? "End time must be after start time."
+      : null;
 
   function slugify(s: string) {
     return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -108,7 +118,10 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
                 value={state.startsAt}
                 onChange={(e) => set("startsAt", e.target.value)}
                 required
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+                className={
+                  "w-full h-11 px-4 rounded-lg border focus:outline-none " +
+                  (timeError ? "border-red-300" : "border-navy-200 focus:border-navy-900")
+                }
               />
             </Field>
             <Field label="Ends at" required>
@@ -118,10 +131,17 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
                 value={state.endsAt}
                 onChange={(e) => set("endsAt", e.target.value)}
                 required
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+                min={state.startsAt || undefined}
+                className={
+                  "w-full h-11 px-4 rounded-lg border focus:outline-none " +
+                  (timeError ? "border-red-300" : "border-navy-200 focus:border-navy-900")
+                }
               />
             </Field>
           </div>
+          {timeError && (
+            <p className="text-sm text-red-600 -mt-2">⚠ {timeError}</p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Format">
               <select
@@ -132,7 +152,6 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
               >
                 <option value="ONLINE">Online</option>
                 <option value="IN_PERSON">In person</option>
-                <option value="HYBRID">Hybrid</option>
               </select>
             </Field>
             <Field label="Sector tag (optional)">
@@ -217,7 +236,13 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
             </span>
           </label>
 
-          <Button type="submit" variant="primary" size="md" className="w-full">
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            className="w-full"
+            disabled={!!timeError}
+          >
             <Save className="h-4 w-4" />
             {isEdit ? "Save changes" : "Create event"}
           </Button>

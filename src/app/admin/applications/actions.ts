@@ -91,6 +91,10 @@ export async function updateApplication(formData: FormData) {
   revalidatePath(`/admin/applications/${id}`);
   revalidatePath(`/admin/applications`);
   revalidatePath(`/admin`);
+  // Redirect so the page hard-reloads with the saved values. Without this the
+  // uncontrolled defaultValue inputs keep their pre-save state in React and it
+  // looks like nothing happened.
+  redirect(`/admin/applications/${id}?saved=1`);
 }
 
 export async function deleteApplication(formData: FormData) {

@@ -19,6 +19,7 @@ import {
 export const metadata = { title: "Admin · Application" };
 
 type Params = Promise<{ id: string }>;
+type Search = Promise<{ saved?: string }>;
 
 const STATUSES = ["NEW", "CONTACTED", "IN_PROGRESS", "WON", "LOST", "ARCHIVED"];
 
@@ -44,8 +45,15 @@ const GRAD_YEARS = [
   ...Array.from({ length: 21 }, (_, i) => String(CURRENT_YEAR - i)),
 ];
 
-export default async function ApplicationDetailPage({ params }: { params: Params }) {
+export default async function ApplicationDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: Search;
+}) {
   const { id } = await params;
+  const { saved } = await searchParams;
   const app = await prisma.application.findUnique({ where: { id } });
   if (!app) notFound();
 
@@ -60,6 +68,12 @@ export default async function ApplicationDetailPage({ params }: { params: Params
       >
         <ArrowLeft className="h-4 w-4" /> All applications
       </Link>
+
+      {saved && (
+        <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+          Changes saved.
+        </div>
+      )}
 
       <div className="flex items-start justify-between gap-6 flex-wrap mb-8">
         <div className="flex items-start gap-5">

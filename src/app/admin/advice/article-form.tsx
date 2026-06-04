@@ -26,6 +26,7 @@ const CATEGORIES = [
   "Assessment",
   "Industry insights",
   "Working life",
+  "Other",
 ];
 
 type Props = {
