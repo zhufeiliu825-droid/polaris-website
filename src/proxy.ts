@@ -35,6 +35,6 @@ export function proxy(req: NextRequest) {
 
 export const config = {
   matcher: ["/admin/:path*"],
-  // Node runtime so we can use node:crypto + bcrypt downstream.
-  runtime: "nodejs",
+  // `runtime` is not configurable in proxy.ts — Next 16 always runs proxy on
+  // Node.js, which is exactly what we need for node:crypto + bcrypt.
 };
