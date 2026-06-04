@@ -153,17 +153,13 @@ export default function ServicesPage() {
             {[
               {
                 href: "/brochures/polaris-intro-en.pdf",
-                lang: "English",
-                size: "1.0 MB",
+                lang: "English · PDF",
                 title: "Polaris programme guide",
-                subtitle: "21 pages · English edition",
               },
               {
                 href: "/brochures/polaris-intro-zh.pdf",
-                lang: "中文",
-                size: "2.8 MB",
+                lang: "中文 · PDF",
                 title: "Polaris 项目介绍",
-                subtitle: "21 页 · 中文版",
               },
             ].map((b) => (
               <a
@@ -171,21 +167,20 @@ export default function ServicesPage() {
                 href={b.href}
                 target="_blank"
                 rel="noopener"
-                className="group flex items-start gap-4 bg-white border border-navy-100 rounded-2xl p-6 hover:border-navy-900 hover:shadow-md transition-all"
+                className="group flex items-center gap-4 bg-white border border-navy-100 rounded-2xl p-6 hover:border-navy-900 hover:shadow-md transition-all"
               >
                 <div className="shrink-0 h-12 w-12 rounded-xl bg-sand-100 text-sand-700 flex items-center justify-center">
                   <Download className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
-                    {b.lang} · PDF · {b.size}
+                    {b.lang}
                   </p>
                   <h3 className="mt-2 text-lg font-medium text-navy-950 group-hover:text-navy-700">
                     {b.title}
                   </h3>
-                  <p className="mt-1 text-sm text-navy-500">{b.subtitle}</p>
                 </div>
-                <ArrowRight className="h-5 w-5 text-navy-400 shrink-0 self-center group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-5 w-5 text-navy-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </a>
             ))}
           </div>
