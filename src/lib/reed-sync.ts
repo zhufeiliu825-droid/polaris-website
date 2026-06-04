@@ -14,7 +14,12 @@
  */
 
 import { prisma } from "@/lib/db";
-import { reedSearchAll, cleanReedDescription, parseReedDate } from "@/lib/reed";
+import {
+  reedSearchAll,
+  reedDetails,
+  cleanReedDescription,
+  parseReedDate,
+} from "@/lib/reed";
 import {
   reedSectors,
   chineseLanguageConfig,
@@ -75,7 +80,8 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
       const results = await reedSearchAll(
         {
           keywords: sector.keywords,
-          locationName: "london",
+          // No locationName — search UK-wide. We normalise each result's
+          // postcode → city name before saving (see normalizeLocation).
           graduate: sector.graduate,
           fullTime: true,
         },
@@ -111,7 +117,6 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
     const chineseResults = await reedSearchAll(
       {
         keywords: chineseLanguageConfig.keywords,
-        locationName: "london",
         graduate: chineseLanguageConfig.graduate,
       },
       CHINESE_TARGET
@@ -138,6 +143,44 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
     log(
       `  ${"Chinese".padEnd(13)} ${String(chineseResults.length).padStart(3)} returned · ${added} new, ${flagged} flag-only · ${((Date.now() - chineseStart) / 1000).toFixed(1)}s`
     );
+
+    // ─── Stage 3: enrich location for postcode-only entries ─────
+    // Reed's /search returns a raw postcode for the `locationName`
+    // (e.g. "HP27DN") whenever the employer typed one. /jobs/{id}
+    // returns the proper area name ("Hemel Hempstead Industrial
+    // Estate"). We fetch details only for the postcode-shaped
+    // entries to keep API calls manageable.
+    const POSTCODE_ONLY = /^[A-Z]{1,2}\d[A-Z0-9]?\s?\d[A-Z]{2}$/i;
+    const needsEnrich = [...byId.values()].filter(
+      (j) => !j.locationName || POSTCODE_ONLY.test(j.locationName.trim())
+    );
+    if (needsEnrich.length > 0) {
+      const enrichStart = Date.now();
+      const CONCURRENCY = 10;
+      let enriched = 0;
+      for (let i = 0; i < needsEnrich.length; i += CONCURRENCY) {
+        const batch = needsEnrich.slice(i, i + CONCURRENCY);
+        await Promise.all(
+          batch.map(async (j) => {
+            try {
+              const d = await reedDetails(j.id);
+              apiCalls++;
+              if (d.locationName) {
+                j.locationName = d.locationName;
+                enriched++;
+              }
+              // Bonus fields the details endpoint gives us "for free":
+              if (d.externalUrl) j.externalUrl = d.externalUrl;
+            } catch {
+              // Per-job error — keep the postcode rather than fail the sync.
+            }
+          })
+        );
+      }
+      log(
+        `  ${"Locations".padEnd(13)} ${String(needsEnrich.length).padStart(3)} fetched · ${enriched} resolved · ${((Date.now() - enrichStart) / 1000).toFixed(1)}s`
+      );
+    }
 
     // ─── Persist ────────────────────────────────────────────────
     const jobs = [...byId.values()];
