@@ -22,7 +22,6 @@ export const siteConfig = {
     { href: "/events", label: "Events" },
     { href: "/advice", label: "Advice" },
     { href: "/services", label: "Services" },
-    { href: "/about", label: "About" },
   ],
   industries: [
     "Finance",

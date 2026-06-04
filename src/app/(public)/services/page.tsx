@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
 import { ButtonLink } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Download } from "lucide-react";
 
 export const metadata = { title: "Services" };
 
@@ -72,8 +72,9 @@ export default function ServicesPage() {
         subtitle="From self-awareness to post-offer support, we accompany you through every phase of getting hired and getting ahead."
       />
 
-      {/* PROGRAMS */}
-      <section className="py-20 md:py-28 bg-paper">
+      {/* PROGRAMS — anchor for "Enquire" CTAs from elsewhere and the
+          landing target for /services itself. */}
+      <section id="programmes" className="py-20 md:py-28 bg-paper scroll-mt-4">
         <Container>
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
@@ -118,7 +119,7 @@ export default function ServicesPage() {
                   {p.target}
                 </p>
                 <ButtonLink
-                  href="/contact"
+                  href="/join#form"
                   variant={p.featured ? "primary" : "outline"}
                   size="md"
                   className="mt-8"
@@ -126,6 +127,66 @@ export default function ServicesPage() {
                   Enquire <ArrowRight className="h-4 w-4" />
                 </ButtonLink>
               </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* BROCHURES */}
+      <section className="pb-20 md:pb-28 bg-paper">
+        <Container>
+          <div className="max-w-2xl mb-10">
+            <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
+              Brochures
+            </p>
+            <h2 className="mt-3 text-3xl md:text-4xl font-light tracking-tight text-navy-950">
+              Take the full Polaris story with you.
+            </h2>
+            <p className="mt-4 text-navy-600 leading-relaxed">
+              The complete 21-page programme guide — covering our six-stage
+              process, programmes, mentors, and case studies — in either
+              English or Chinese.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+            {[
+              {
+                href: "/brochures/polaris-intro-en.pdf",
+                lang: "English",
+                size: "1.0 MB",
+                title: "Polaris programme guide",
+                subtitle: "21 pages · English edition",
+              },
+              {
+                href: "/brochures/polaris-intro-zh.pdf",
+                lang: "中文",
+                size: "2.8 MB",
+                title: "Polaris 项目介绍",
+                subtitle: "21 页 · 中文版",
+              },
+            ].map((b) => (
+              <a
+                key={b.href}
+                href={b.href}
+                target="_blank"
+                rel="noopener"
+                className="group flex items-start gap-4 bg-white border border-navy-100 rounded-2xl p-6 hover:border-navy-900 hover:shadow-md transition-all"
+              >
+                <div className="shrink-0 h-12 w-12 rounded-xl bg-sand-100 text-sand-700 flex items-center justify-center">
+                  <Download className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
+                    {b.lang} · PDF · {b.size}
+                  </p>
+                  <h3 className="mt-2 text-lg font-medium text-navy-950 group-hover:text-navy-700">
+                    {b.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-navy-500">{b.subtitle}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-navy-400 shrink-0 self-center group-hover:translate-x-0.5 transition-transform" />
+              </a>
             ))}
           </div>
         </Container>
