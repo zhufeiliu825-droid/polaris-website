@@ -1,13 +1,32 @@
 /**
- * Server-side data access for jobs — now Prisma-backed.
+ * Server-side data access for jobs — Prisma-backed.
  *
- * The page components are unchanged from the jobs.json days; we just swapped
- * the storage layer. Sync is driven by `runReedSync()` on a Vercel Cron
- * (daily) or via `npm run reed:sync` locally.
+ * Sync writes to the Job table on a Vercel Cron schedule; reads here power
+ * the public /opportunities page and the admin dashboard tile.
  */
 
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
+
+/**
+ * The major UK cities we surface as their own filter chip. Anything not
+ * matching one of these substrings buckets into "Other" in the city filter.
+ */
+export const MAJOR_CITIES = [
+  "London",
+  "Manchester",
+  "Birmingham",
+  "Bristol",
+  "Edinburgh",
+  "Leeds",
+  "Liverpool",
+  "Glasgow",
+] as const;
+
+export type MajorCity = (typeof MAJOR_CITIES)[number];
+
+/** Sentinel used for the "anything not in MAJOR_CITIES" filter chip. */
+export const OTHER_CITY = "Other";
 
 export type StoredJob = {
   id: string;
@@ -27,8 +46,10 @@ export type StoredJob = {
 };
 
 export type JobFilter = {
-  sectors?: string[];
-  chineseOnly?: boolean;
+  /** Single-select sector. `undefined` = all sectors. */
+  sector?: string;
+  /** Single-select city. One of MAJOR_CITIES, OTHER_CITY, or undefined = all. */
+  city?: string;
   search?: string;
   limit?: number;
   offset?: number;
@@ -68,20 +89,36 @@ function toStoredJob(j: {
   };
 }
 
-export async function listJobs(filter: JobFilter = {}): Promise<{
-  jobs: StoredJob[];
-  total: number;
-  fetchedAt: string;
-}> {
-  const where: Prisma.JobWhereInput = {
-    isActive: true,
-  };
-  if (filter.sectors && filter.sectors.length > 0) {
-    where.sectors = { hasSome: filter.sectors };
+/**
+ * Builds an extra Prisma where-clause object for a given city selection,
+ * to be spread into the outer `where`. Returns null when no city filter.
+ *
+ * - Major city (e.g. "London") → substring match on locationName.
+ * - "Other"                    → not-null AND not-substring-of-any-major-city.
+ */
+function cityClause(city: string | undefined): Prisma.JobWhereInput | null {
+  if (!city) return null;
+  if (city === OTHER_CITY) {
+    return {
+      AND: [
+        { locationName: { not: null } },
+        ...MAJOR_CITIES.map((c) => ({
+          NOT: { locationName: { contains: c, mode: "insensitive" as const } },
+        })),
+      ],
+    };
   }
-  if (filter.chineseOnly) {
-    where.isChineseSpeaking = true;
+  if ((MAJOR_CITIES as readonly string[]).includes(city)) {
+    return { locationName: { contains: city, mode: "insensitive" } };
   }
+  return null;
+}
+
+function buildWhere(filter: JobFilter): Prisma.JobWhereInput {
+  const where: Prisma.JobWhereInput = { isActive: true };
+  if (filter.sector) where.sectors = { has: filter.sector };
+  const loc = cityClause(filter.city);
+  if (loc) Object.assign(where, loc);
   if (filter.search) {
     const q = filter.search.trim();
     where.OR = [
@@ -89,7 +126,15 @@ export async function listJobs(filter: JobFilter = {}): Promise<{
       { employerName: { contains: q, mode: "insensitive" } },
     ];
   }
+  return where;
+}
 
+export async function listJobs(filter: JobFilter = {}): Promise<{
+  jobs: StoredJob[];
+  total: number;
+  fetchedAt: string;
+}> {
+  const where = buildWhere(filter);
   const [rows, total, latest] = await Promise.all([
     prisma.job.findMany({
       where,
@@ -117,24 +162,59 @@ export async function getJob(id: string): Promise<StoredJob | null> {
   return row ? toStoredJob(row) : null;
 }
 
-export async function countsByFilter(filter: { chineseOnly?: boolean } = {}): Promise<{
-  perSectorCounts: Record<string, number>;
+/**
+ * All counts needed by the filter sidebar.
+ *
+ * Each per-sector count is computed under the active city filter, and each
+ * per-city count under the active sector filter — so the user can see exactly
+ * how many results they'd get for any single change.
+ */
+export async function filterCounts(filter: {
+  sector?: string;
+  city?: string;
+}): Promise<{
   total: number;
-  chineseSpeakingCount: number;
+  perSectorCounts: Record<string, number>;
+  perCityCounts: Record<string, number>;
+  otherCityCount: number;
   fetchedAt: string;
 }> {
-  const where: Prisma.JobWhereInput = {
-    isActive: true,
-  };
-  if (filter.chineseOnly) where.isChineseSpeaking = true;
+  // Total under both active filters.
+  const totalWhere = buildWhere({ sector: filter.sector, city: filter.city });
 
-  const [rows, total, chineseSpeakingCount, latest] = await Promise.all([
-    prisma.job.findMany({
-      where,
-      select: { sectors: true },
+  // Per-sector counts: hold the city filter, vary the sector. Use groupBy
+  // on `sectors` (unnested) so multi-sector jobs are counted once per sector.
+  const sectorWhere = buildWhere({ city: filter.city });
+  const sectorRows = await prisma.job.findMany({
+    where: sectorWhere,
+    select: { sectors: true },
+  });
+  const perSectorCounts: Record<string, number> = {};
+  for (const r of sectorRows) {
+    for (const s of r.sectors) {
+      perSectorCounts[s] = (perSectorCounts[s] ?? 0) + 1;
+    }
+  }
+
+  // Per-city counts: hold the sector filter, vary the city. Issue one count
+  // query per major city + one for "Other".
+  const cityWhere = buildWhere({ sector: filter.sector });
+  const [cityCountPairs, otherCityCount, totalUnderActive, latest] = await Promise.all([
+    Promise.all(
+      MAJOR_CITIES.map(async (c) => {
+        const n = await prisma.job.count({
+          where: {
+            ...cityWhere,
+            locationName: { contains: c, mode: "insensitive" },
+          },
+        });
+        return [c, n] as const;
+      })
+    ),
+    prisma.job.count({
+      where: { ...cityWhere, ...cityClause(OTHER_CITY) },
     }),
-    prisma.job.count({ where }),
-    prisma.job.count({ where: { isActive: true, isChineseSpeaking: true } }),
+    prisma.job.count({ where: totalWhere }),
     prisma.jobSyncRun.findFirst({
       where: { ok: true },
       orderBy: { endedAt: "desc" },
@@ -142,21 +222,29 @@ export async function countsByFilter(filter: { chineseOnly?: boolean } = {}): Pr
     }),
   ]);
 
-  const perSectorCounts: Record<string, number> = {};
-  for (const r of rows) {
-    for (const s of r.sectors) {
-      perSectorCounts[s] = (perSectorCounts[s] ?? 0) + 1;
-    }
-  }
+  const perCityCounts: Record<string, number> = Object.fromEntries(cityCountPairs);
+
   return {
+    total: totalUnderActive,
     perSectorCounts,
-    total,
-    chineseSpeakingCount,
+    perCityCounts,
+    otherCityCount,
     fetchedAt: latest?.endedAt?.toISOString() ?? new Date(0).toISOString(),
   };
 }
 
+/** Convenience for the admin dashboard tile. */
 export async function jobsMetadata() {
-  const { total, fetchedAt, perSectorCounts } = await countsByFilter();
-  return { total, fetchedAt, perSectorCounts };
+  const [total, latest] = await Promise.all([
+    prisma.job.count({ where: { isActive: true } }),
+    prisma.jobSyncRun.findFirst({
+      where: { ok: true },
+      orderBy: { endedAt: "desc" },
+      select: { endedAt: true },
+    }),
+  ]);
+  return {
+    total,
+    fetchedAt: latest?.endedAt?.toISOString() ?? new Date(0).toISOString(),
+  };
 }

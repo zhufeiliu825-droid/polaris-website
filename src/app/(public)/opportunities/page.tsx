@@ -1,13 +1,27 @@
 import Link from "next/link";
-import { Search, MapPin, Calendar, Building2, ArrowRight, Briefcase, Languages, Check } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Calendar,
+  Building2,
+  ArrowRight,
+  Briefcase,
+} from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
-import { listJobs, countsByFilter } from "@/lib/jobs";
-import { reedSectors, chineseLanguageConfig } from "@/lib/site";
+import {
+  listJobs,
+  filterCounts,
+  MAJOR_CITIES,
+  OTHER_CITY,
+} from "@/lib/jobs";
+import { reedSectors } from "@/lib/site";
 
 export const metadata = { title: "Opportunities" };
 
 const PAGE_SIZE = 25;
+const ALL_SECTORS_LABEL = "All sectors";
+const ALL_CITIES_LABEL = "All UK";
 
 function fmtCount(n: number): string {
   return n >= 99 ? "99+" : String(n);
@@ -36,8 +50,8 @@ function formatPostedAgo(iso: string | null) {
 }
 
 type SearchParamsP = Promise<{
-  sector?: string | string[];
-  language?: string | string[];
+  sector?: string;
+  city?: string;
   q?: string;
   page?: string;
 }>;
@@ -48,44 +62,56 @@ export default async function OpportunitiesPage({
   searchParams: SearchParamsP;
 }) {
   const sp = await searchParams;
-  const selectedSectors = sp.sector
-    ? Array.isArray(sp.sector)
+
+  // Single-select sector + city.
+  const validSectorKeys = new Set(reedSectors.map((s) => s.key as string));
+  const sector =
+    typeof sp.sector === "string" && validSectorKeys.has(sp.sector)
       ? sp.sector
-      : [sp.sector]
-    : [];
-  const selectedLanguages = sp.language
-    ? Array.isArray(sp.language)
-      ? sp.language
-      : [sp.language]
-    : [];
-  const chineseOnly = selectedLanguages.includes(chineseLanguageConfig.key);
+      : undefined;
+
+  const validCityKeys = new Set<string>([...MAJOR_CITIES, OTHER_CITY]);
+  const city =
+    typeof sp.city === "string" && validCityKeys.has(sp.city)
+      ? sp.city
+      : undefined;
+
   const q = (sp.q ?? "").trim();
   const page = Math.max(1, Number(sp.page ?? "1") || 1);
 
   const [{ jobs, total, fetchedAt }, counts] = await Promise.all([
     listJobs({
-      sectors: selectedSectors.length ? selectedSectors : undefined,
-      chineseOnly,
+      sector,
+      city,
       search: q || undefined,
       limit: PAGE_SIZE,
       offset: (page - 1) * PAGE_SIZE,
     }),
-    // Sector counts reflect the active language filter.
-    countsByFilter({ chineseOnly }),
+    filterCounts({ sector, city }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const buildHref = (overrides: {
-    sector?: string[];
-    language?: string[];
+    sector?: string | null; // null clears
+    city?: string | null;
     q?: string;
     page?: number;
   }) => {
     const next = new URLSearchParams();
-    const sectors = overrides.sector ?? selectedSectors;
-    sectors.forEach((s) => next.append("sector", s));
-    const languages = overrides.language ?? selectedLanguages;
-    languages.forEach((l) => next.append("language", l));
+    const nextSector =
+      overrides.sector === null
+        ? undefined
+        : overrides.sector !== undefined
+          ? overrides.sector
+          : sector;
+    if (nextSector) next.set("sector", nextSector);
+    const nextCity =
+      overrides.city === null
+        ? undefined
+        : overrides.city !== undefined
+          ? overrides.city
+          : city;
+    if (nextCity) next.set("city", nextCity);
     const qq = overrides.q ?? q;
     if (qq) next.set("q", qq);
     const pp = overrides.page ?? 1;
@@ -99,7 +125,7 @@ export default async function OpportunitiesPage({
       <PageHero
         eyebrow="Opportunities"
         title="Graduate jobs, internships and schemes — handpicked."
-        subtitle={`A curated feed of ${fmtCount(counts.total)} live opportunities. Refreshed from Reed and partner employers.`}
+        subtitle={`A curated feed of ${fmtCount(counts.total)} live opportunities. Refreshed daily from Reed and partner employers.`}
       />
 
       <section className="bg-paper py-12">
@@ -118,65 +144,68 @@ export default async function OpportunitiesPage({
                     className="w-full h-11 pl-9 pr-4 rounded-full border border-navy-200 text-sm focus:outline-none focus:border-navy-900"
                   />
                 </div>
-                {selectedSectors.map((s) => (
-                  <input key={s} type="hidden" name="sector" value={s} />
-                ))}
-                {selectedLanguages.map((l) => (
-                  <input key={l} type="hidden" name="language" value={l} />
-                ))}
+                {sector && <input type="hidden" name="sector" value={sector} />}
+                {city && <input type="hidden" name="city" value={city} />}
               </form>
 
               <FilterGroup title="Sector">
                 <SidebarRow
-                  href={buildHref({ sector: [], page: 1 })}
-                  active={selectedSectors.length === 0}
-                  label="All sectors"
-                  count={fmtCount(counts.total)}
+                  href={buildHref({ sector: null, page: 1 })}
+                  active={!sector}
+                  label={ALL_SECTORS_LABEL}
+                  count={fmtCount(
+                    Object.values(counts.perSectorCounts).reduce(
+                      (a, b) => Math.max(a, b),
+                      0
+                    ) > 0
+                      ? Object.values(counts.perSectorCounts).reduce(
+                          (a, b) => a + b,
+                          0
+                        )
+                      : counts.total
+                  )}
                 />
-                {reedSectors.map((s) => {
-                  const isSelected = selectedSectors.includes(s.key);
-                  const nextSectors = isSelected
-                    ? selectedSectors.filter((x) => x !== s.key)
-                    : [...selectedSectors, s.key];
-                  const sectorCount = counts.perSectorCounts[s.key] ?? 0;
-                  return (
-                    <SidebarRow
-                      key={s.key}
-                      href={buildHref({ sector: nextSectors, page: 1 })}
-                      active={isSelected}
-                      label={s.label}
-                      count={fmtCount(sectorCount)}
-                    />
-                  );
-                })}
-                {(counts.perSectorCounts["Other"] ?? 0) > 0 && chineseOnly && (
+                {reedSectors.map((s) => (
                   <SidebarRow
-                    href={buildHref({
-                      sector: selectedSectors.includes("Other")
-                        ? selectedSectors.filter((x) => x !== "Other")
-                        : [...selectedSectors, "Other"],
-                      page: 1,
-                    })}
-                    active={selectedSectors.includes("Other")}
-                    label="Other"
-                    count={fmtCount(counts.perSectorCounts["Other"] ?? 0)}
+                    key={s.key}
+                    href={buildHref({ sector: s.key, page: 1 })}
+                    active={sector === s.key}
+                    label={s.label}
+                    count={fmtCount(counts.perSectorCounts[s.key] ?? 0)}
                   />
-                )}
+                ))}
               </FilterGroup>
 
-              <FilterGroup title="Language">
-                <ToggleRow
-                  href={buildHref({
-                    language: chineseOnly ? [] : [chineseLanguageConfig.key],
-                    page: 1,
-                  })}
-                  active={chineseOnly}
-                  label="Chinese-speaking only"
-                  count={fmtCount(counts.chineseSpeakingCount)}
+              <FilterGroup title="City">
+                <SidebarRow
+                  href={buildHref({ city: null, page: 1 })}
+                  active={!city}
+                  label={ALL_CITIES_LABEL}
+                  count={fmtCount(
+                    Object.values(counts.perCityCounts).reduce(
+                      (a, b) => a + b,
+                      0
+                    ) + counts.otherCityCount
+                  )}
+                />
+                {MAJOR_CITIES.map((c) => (
+                  <SidebarRow
+                    key={c}
+                    href={buildHref({ city: c, page: 1 })}
+                    active={city === c}
+                    label={c}
+                    count={fmtCount(counts.perCityCounts[c] ?? 0)}
+                  />
+                ))}
+                <SidebarRow
+                  href={buildHref({ city: OTHER_CITY, page: 1 })}
+                  active={city === OTHER_CITY}
+                  label="Other"
+                  count={fmtCount(counts.otherCityCount)}
                 />
               </FilterGroup>
 
-              {(selectedSectors.length > 0 || chineseOnly || q) && (
+              {(sector || city || q) && (
                 <Link
                   href="/opportunities"
                   className="text-xs text-navy-600 hover:text-navy-900 underline underline-offset-4"
@@ -200,28 +229,27 @@ export default async function OpportunitiesPage({
             <div>
               <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                 <p className="text-sm text-navy-600">
-                  <strong className="text-navy-950">{fmtCount(total)}</strong> opportunit
-                  {total === 1 ? "y" : "ies"}
-                  {selectedSectors.length > 0 && (
+                  <strong className="text-navy-950">{fmtCount(total)}</strong>{" "}
+                  opportunit{total === 1 ? "y" : "ies"}
+                  {sector && (
                     <>
                       {" "}
-                      in{" "}
-                      <strong className="text-navy-950">
-                        {selectedSectors.join(", ")}
-                      </strong>
+                      in <strong className="text-navy-950">{sector}</strong>
                     </>
                   )}
-                  {chineseOnly && (
+                  {city && (
                     <>
                       {" "}
                       ·{" "}
-                      <strong className="text-navy-950">Chinese-speaking</strong>
+                      <strong className="text-navy-950">
+                        {city === OTHER_CITY ? "Other UK cities" : city}
+                      </strong>
                     </>
                   )}
                   {q && (
                     <>
                       {" "}
-                      matching <strong className="text-navy-950">“{q}”</strong>
+                      matching <strong className="text-navy-950">&ldquo;{q}&rdquo;</strong>
                     </>
                   )}
                 </p>
@@ -253,11 +281,6 @@ export default async function OpportunitiesPage({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-sand-700 font-semibold flex-wrap">
                                 <span>{job.sectors.join(" · ")}</span>
-                                {job.isChineseSpeaking && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-royal-500/10 text-royal-600 text-[10px] tracking-wider">
-                                    <Languages className="h-3 w-3" /> Chinese-speaking
-                                  </span>
-                                )}
                                 {postedAgo === "Today" && (
                                   <span className="ml-1 px-2 py-0.5 text-[10px] tracking-wider rounded-full bg-navy-950 text-white">
                                     NEW
@@ -382,47 +405,6 @@ function SidebarRow({
         }
       >
         <span>{label}</span>
-        <span className={"text-xs " + (active ? "text-sand-300" : "text-navy-500")}>
-          {count}
-        </span>
-      </Link>
-    </li>
-  );
-}
-
-function ToggleRow({
-  href,
-  active,
-  label,
-  count,
-}: {
-  href: string;
-  active: boolean;
-  label: string;
-  count: string;
-}) {
-  return (
-    <li>
-      <Link
-        href={href}
-        className={
-          "flex items-center gap-3 py-2 text-sm rounded-md px-2 -mx-2 " +
-          (active
-            ? "bg-navy-950 text-white font-medium"
-            : "text-navy-700 hover:bg-navy-50")
-        }
-      >
-        <span
-          className={
-            "h-4 w-4 rounded border flex items-center justify-center shrink-0 " +
-            (active
-              ? "bg-sand-300 border-sand-300 text-navy-950"
-              : "bg-white border-navy-300")
-          }
-        >
-          {active && <Check className="h-3 w-3" strokeWidth={3} />}
-        </span>
-        <span className="flex-1">{label}</span>
         <span className={"text-xs " + (active ? "text-sand-300" : "text-navy-500")}>
           {count}
         </span>
