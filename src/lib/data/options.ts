@@ -127,7 +127,7 @@ export const referralSources = [
  */
 export const nationalities = [
   "United Kingdom",
-  "China",
+  "China mainland",
   "Hong Kong, China",
   "Macao, China",
   "Taiwan, China",
