@@ -39,4 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-data/
+# Top-level data/ holds jobs.json (Reed sync output) — replaced by DB on Vercel.
+# Important: leading slash so we DON'T also ignore src/lib/data/ source files.
+/data/
