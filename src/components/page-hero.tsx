@@ -17,7 +17,9 @@ export function PageHero({
         className="absolute inset-0 opacity-[0.12] bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
         aria-hidden="true"
       />
-      <Container className="relative py-20 md:py-28">
+      {/* Fixed min-height so every page's hero matches — short titles
+          centre vertically in the same box that long ones fill. */}
+      <Container className="relative min-h-[420px] md:min-h-[480px] py-16 md:py-20 flex flex-col justify-center">
         {eyebrow && (
           <p className="text-xs uppercase tracking-widest text-sand-300 font-semibold">
             {eyebrow}
