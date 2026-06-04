@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, MapPin, Users, ArrowRight, Globe2 } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, Globe2 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
 import { prisma } from "@/lib/db";
@@ -75,11 +75,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
   const orderBy: Prisma.EventOrderByWithRelationInput =
     activeWhen === "past" ? { startsAt: "desc" } : { startsAt: "asc" };
 
-  const events = await prisma.event.findMany({
-    where,
-    orderBy,
-    include: { _count: { select: { registrations: true } } },
-  });
+  const events = await prisma.event.findMany({ where, orderBy });
 
   /**
    * Builds the href for a chip in a given axis. Keeps the other axis's
@@ -135,10 +131,6 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
                 const { date, time } = formatEventDateTime(e.startsAt, e.endsAt);
                 const isOnline = e.format === "ONLINE";
                 const isPast = e.endsAt < now;
-                const spotsLeft =
-                  e.capacity != null
-                    ? Math.max(0, e.capacity - e._count.registrations)
-                    : null;
                 return (
                   <li key={e.id}>
                     <Link
@@ -195,14 +187,6 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
                           <MapPin className="h-4 w-4 text-sand-500" />
                           {e.location}
                         </div>
-                        {spotsLeft != null && !isPast && (
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-sand-500" />
-                            {spotsLeft > 0
-                              ? `${spotsLeft} spots left`
-                              : "Fully booked"}
-                          </div>
-                        )}
                       </div>
 
                       <div className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-navy-900 group-hover:gap-2.5 transition-all">

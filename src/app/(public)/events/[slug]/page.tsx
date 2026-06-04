@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, MapPin, Users, Globe2, Tag } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Globe2, Tag } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Markdown } from "@/components/markdown";
 import { prisma } from "@/lib/db";
@@ -16,10 +16,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const e = await prisma.event.findUnique({
-    where: { slug },
-    include: { _count: { select: { registrations: true } } },
-  });
+  const e = await prisma.event.findUnique({ where: { slug } });
   if (!e || !e.published) notFound();
 
   const isOnline = e.format === "ONLINE";
@@ -36,8 +33,6 @@ export default async function EventDetailPage({ params }: PageProps) {
     hour12: false,
   });
   const time = `${timeFmt.format(e.startsAt)}–${timeFmt.format(e.endsAt)}`;
-  const spotsLeft =
-    e.capacity != null ? Math.max(0, e.capacity - e._count.registrations) : null;
 
   return (
     <article className="bg-paper">
@@ -102,18 +97,6 @@ export default async function EventDetailPage({ params }: PageProps) {
                     <p className="text-navy-600">{e.location}</p>
                   </div>
                 </div>
-                {spotsLeft != null && !isPast && (
-                  <div className="flex items-start gap-3">
-                    <Users className="h-5 w-5 text-sand-500 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-navy-950">
-                        {spotsLeft > 0
-                          ? `${spotsLeft} of ${e.capacity} spots left`
-                          : "Fully booked"}
-                      </p>
-                    </div>
-                  </div>
-                )}
                 {/* Past events: surface a small "This event has ended" note
                     instead of a now-pointless registration CTA. */}
                 {isPast ? (
