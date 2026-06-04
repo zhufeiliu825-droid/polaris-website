@@ -2,11 +2,14 @@
  * Reed → Postgres sync. Callable from both the CLI script
  * (`scripts/reed-sync.ts`) and the Vercel Cron API route.
  *
- * Two-stage fetch:
- *   1. 6 sector searches (graduate-filtered), each tagging results with that
- *      sector. Multi-matching jobs accumulate sectors.
- *   2. Chinese-language catchall — auto-classifies each result into one of
- *      the 6 sectors and flags `isChineseSpeaking: true`.
+ * Pipeline:
+ *   1. 6 sector searches (permanent + graduate-filtered). Each result is
+ *      tagged with its sector. Multi-matching jobs accumulate sectors.
+ *   2. Each result is scanned for "chinese / mandarin / cantonese" in the
+ *      title or description. Matches get `isChineseSpeaking: true` — no
+ *      separate Reed query, we just classify what we already pulled.
+ *   3. Postcode-only locations are enriched via /jobs/{id} for a proper
+ *      city name.
  *
  * Then upserts every fetched job into the Job table, and marks Jobs that
  * weren't returned this run as inactive (cheap soft-delete — they keep
@@ -20,12 +23,7 @@ import {
   cleanReedDescription,
   parseReedDate,
 } from "@/lib/reed";
-import {
-  reedSectors,
-  chineseLanguageConfig,
-  classifySectorFromText,
-  type SectorKey,
-} from "@/lib/site";
+import { reedSectors, type SectorKey } from "@/lib/site";
 
 export type SyncResult = {
   ok: boolean;
@@ -44,7 +42,6 @@ export type SyncResult = {
 const CHINESE_REGEX = /\b(chinese|mandarin|cantonese)\b/i;
 
 const TARGET_PER_SECTOR = 100;
-const CHINESE_TARGET = 200;
 
 type StagedJob = {
   id: string;
@@ -113,40 +110,10 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
       );
     }
 
-    // ─── Stage 2: Chinese catchall ──────────────────────────────
-    const chineseStart = Date.now();
-    const chineseResults = await reedSearchAll(
-      {
-        keywords: chineseLanguageConfig.keywords,
-        permanent: true,
-        graduate: true,
-      },
-      CHINESE_TARGET
-    );
-    apiCalls += Math.ceil(chineseResults.length / 100) || 1;
+    // (Chinese-speaking flag is applied inline during stage 1 — see
+    // the CHINESE_REGEX check in the sector loop.)
 
-    let added = 0;
-    let flagged = 0;
-    for (const j of chineseResults) {
-      const id = String(j.jobId);
-      const description = cleanReedDescription(j.jobDescription);
-      const existing = byId.get(id);
-      if (existing) {
-        if (!existing.isChineseSpeaking) {
-          existing.isChineseSpeaking = true;
-          flagged++;
-        }
-        continue;
-      }
-      const classified = classifySectorFromText(j.jobTitle + " " + description.slice(0, 200));
-      byId.set(id, stage(j, [classified], true, description));
-      added++;
-    }
-    log(
-      `  ${"Chinese".padEnd(13)} ${String(chineseResults.length).padStart(3)} returned · ${added} new, ${flagged} flag-only · ${((Date.now() - chineseStart) / 1000).toFixed(1)}s`
-    );
-
-    // ─── Stage 3: enrich location for postcode-only entries ─────
+    // ─── Stage 2: enrich location for postcode-only entries ─────
     // Reed's /search returns a raw postcode for the `locationName`
     // (e.g. "HP27DN") whenever the employer typed one. /jobs/{id}
     // returns the proper area name ("Hemel Hempstead Industrial

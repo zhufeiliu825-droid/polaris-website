@@ -50,60 +50,15 @@ export const reedSectors = [
   { key: "Marketing",   label: "Marketing",   keywords: "marketing" },
 ] as const;
 
-export type SectorKey = (typeof reedSectors)[number]["key"] | "Other";
+export type SectorKey = (typeof reedSectors)[number]["key"];
 
 /**
- * Language is a separate axis from sector. Currently just one: Chinese.
- * Chinese-speaking jobs are pulled in a dedicated search and classified back
- * into one of the 6 sectors (or "Other") via {@link classifySectorFromText}.
+ * "Chinese-speaking" is a UI filter on the opportunities page — it doesn't
+ * drive a separate Reed search. Each result we pull from the 6 sector
+ * searches is checked for chinese / mandarin / cantonese in its title or
+ * description and flagged inline (see CHINESE_REGEX in reed-sync.ts).
  */
 export const chineseLanguageConfig = {
   key: "chinese" as const,
   label: "Chinese-speaking",
-  keywords: "chinese",
 };
-
-/**
- * Heuristic classifier — used to bucket Chinese-speaking jobs into our 6
- * sectors based on the title (and a snippet of description).
- *
- * Order matters: more specific matches first.
- */
-export function classifySectorFromText(text: string): SectorKey {
-  const t = text.toLowerCase();
-  if (
-    /\b(solicitor|paralegal|legal|law|barrister|litigation|conveyanc|immigration|compliance|aml)\b/.test(
-      t
-    )
-  )
-    return "Law";
-  if (
-    /\b(accountant|accounting|audit|auditor|tax|bookkeep|payroll|controller)\b/.test(
-      t
-    )
-  )
-    return "Accounting";
-  if (
-    /\b(engineer|engineering|developer|software|programmer|devops|network|infrastructure|architect|qa|sre|frontend|backend|fullstack|sysadmin|cloud|cyber)\b/.test(
-      t
-    )
-  )
-    return "Engineering";
-  if (
-    /\b(consultant|consulting|strategy|advisor|advisory)\b/.test(t)
-  )
-    return "Consulting";
-  if (
-    /\b(banking|finance|fintech|credit|trader|trading|investment|wealth|insurance|risk|asset|fund|treasury|fx|forex|equity|portfolio|securities|rmb|settlement|clearing|broker)\b/.test(
-      t
-    )
-  )
-    return "Finance";
-  if (
-    /\b(marketing|brand|content|comms|seo|copywrit|social media|pr|publicity|campaign)\b/.test(
-      t
-    )
-  )
-    return "Marketing";
-  return "Other";
-}
