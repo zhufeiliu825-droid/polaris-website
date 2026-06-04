@@ -133,7 +133,7 @@ export default async function OpportunitiesPage({
           <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10">
             {/* FILTERS — sticky + independently scrollable when the list of
                 filter rows would otherwise overflow the viewport. */}
-            <aside className="space-y-7 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-2">
+            <aside className="space-y-7 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
               <form action="/opportunities" method="get">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
@@ -403,7 +403,7 @@ function SidebarRow({
         href={href}
         scroll={false}
         className={
-          "flex items-center justify-between gap-2 py-1.5 text-sm rounded-md px-2 -mx-2 " +
+          "flex items-center justify-between gap-2 py-2 text-sm rounded-md px-3 " +
           (active
             ? "bg-sand-100 text-navy-950 font-medium"
             : "text-navy-700 hover:bg-navy-50")
