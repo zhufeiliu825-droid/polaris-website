@@ -45,6 +45,7 @@ export default async function EditArticlePage({ params }: { params: Params }) {
           authorName: article.authorName ?? "Polaris team",
           published: article.published,
           publishedAt: article.publishedAt?.toISOString() ?? null,
+          isFeatured: article.isFeatured,
           createdAt: article.createdAt.toISOString(),
         }}
         isEdit

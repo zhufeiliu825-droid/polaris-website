@@ -26,15 +26,29 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
   const sp = await searchParams;
   const activeCategory = sp.category && sp.category !== "All" ? sp.category : null;
 
-  const articles = await prisma.article.findMany({
-    where: {
-      published: true,
-      ...(activeCategory ? { category: activeCategory } : {}),
-    },
-    orderBy: { publishedAt: "desc" },
-  });
+  // When viewing All: fetch the featured row separately and the rest below.
+  // When a category filter is active, drop the featured row entirely and just
+  // show the filtered grid — featured cards are meant for the index, not for
+  // category-specific browsing.
+  const [featured, articles] = await Promise.all([
+    activeCategory
+      ? Promise.resolve([])
+      : prisma.article.findMany({
+          where: { published: true, isFeatured: true },
+          orderBy: { publishedAt: "desc" },
+        }),
+    prisma.article.findMany({
+      where: {
+        published: true,
+        ...(activeCategory ? { category: activeCategory } : {}),
+      },
+      orderBy: { publishedAt: "desc" },
+    }),
+  ]);
 
-  const [featured, ...rest] = articles;
+  // Exclude featured articles from the main grid so they don't appear twice.
+  const featuredIds = new Set(featured.map((f) => f.id));
+  const rest = articles.filter((a) => !featuredIds.has(a.id));
 
   return (
     <>
@@ -68,7 +82,7 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
             })}
           </div>
 
-          {articles.length === 0 ? (
+          {articles.length === 0 && featured.length === 0 ? (
             <div className="bg-white border border-navy-100 rounded-2xl p-12 text-center">
               <p className="text-navy-600">
                 Nothing here yet — new articles drop most weeks.{" "}
@@ -80,38 +94,57 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
             </div>
           ) : (
             <>
-              {/* FEATURED (only when viewing All) */}
-              {!activeCategory && featured && (
-                <Link
-                  href={`/advice/${featured.slug}`}
-                  className="group block bg-navy-950 rounded-3xl p-10 md:p-16 mb-12 relative overflow-hidden text-white hover:bg-navy-900 transition-colors"
+              {/* FEATURED row — admin-curated. 1 article → full-width card.
+                  2+ articles → side-by-side. Skipped when a category filter
+                  is active. */}
+              {featured.length > 0 && (
+                <ul
+                  className={
+                    "mb-12 grid gap-6 " +
+                    (featured.length === 1
+                      ? "grid-cols-1"
+                      : featured.length === 2
+                        ? "grid-cols-1 md:grid-cols-2"
+                        : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")
+                  }
                 >
-                  <div
-                    className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
-                    aria-hidden="true"
-                  />
-                  <div className="relative max-w-2xl">
-                    <p className="text-xs uppercase tracking-widest text-sand-300 font-semibold">
-                      Featured · {featured.category}
-                    </p>
-                    <h2 className="mt-4 text-3xl md:text-4xl font-light tracking-tight leading-tight">
-                      {featured.title}
-                    </h2>
-                    <p className="mt-5 text-lg text-navy-100">{featured.excerpt}</p>
-                    <div className="mt-7 flex items-center gap-4 text-sm">
-                      <span className="inline-flex items-center gap-1.5 text-navy-200">
-                        <Clock className="h-4 w-4" /> {featured.readMinutes} min read
-                      </span>
-                      <span className="text-navy-300">·</span>
-                      <span className="text-navy-200">
-                        {formatPublishedDate(featured.publishedAt)}
-                      </span>
-                    </div>
-                    <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-sand-200 group-hover:gap-3 transition-all">
-                      Read article <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </Link>
+                  {featured.map((f) => (
+                    <li key={f.id}>
+                      <Link
+                        href={`/advice/${f.slug}`}
+                        className="group block h-full bg-navy-950 rounded-3xl p-8 md:p-10 relative overflow-hidden text-white hover:bg-navy-900 transition-colors"
+                      >
+                        <div
+                          className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
+                          aria-hidden="true"
+                        />
+                        <div className="relative flex flex-col h-full">
+                          <p className="text-xs uppercase tracking-widest text-sand-300 font-semibold">
+                            Featured · {f.category}
+                          </p>
+                          <h2 className="mt-4 text-2xl md:text-3xl font-light tracking-tight leading-tight">
+                            {f.title}
+                          </h2>
+                          <p className="mt-4 text-base text-navy-100 line-clamp-3">
+                            {f.excerpt}
+                          </p>
+                          <div className="mt-auto pt-6 flex items-center gap-3 text-sm">
+                            <span className="inline-flex items-center gap-1.5 text-navy-200">
+                              <Clock className="h-4 w-4" /> {f.readMinutes} min
+                            </span>
+                            <span className="text-navy-300">·</span>
+                            <span className="text-navy-200">
+                              {formatPublishedDate(f.publishedAt)}
+                            </span>
+                          </div>
+                          <div className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand-200 group-hover:gap-3 transition-all">
+                            Read article <ArrowRight className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               )}
 
               {/* GRID — when filtered, show ALL filtered articles in grid */}

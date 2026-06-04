@@ -16,6 +16,7 @@ type ArticleInitial = {
   authorName: string;
   published: boolean;
   publishedAt: string | null;
+  isFeatured: boolean;
   createdAt: string;
 };
 
@@ -45,6 +46,7 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
     readMinutes: initial?.readMinutes ? String(initial.readMinutes) : "5",
     authorName: initial?.authorName ?? "Polaris team",
     published: initial?.published ?? false,
+    isFeatured: initial?.isFeatured ?? false,
   });
   const [tab, setTab] = useState<"write" | "preview">("write");
 
@@ -220,7 +222,7 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
           <h3 className="text-xs uppercase tracking-widest text-navy-900 font-semibold mb-4">
             Publish
           </h3>
-          <label className="flex items-center gap-3 mb-5">
+          <label className="flex items-center gap-3 mb-3">
             <input
               type="checkbox"
               name="published"
@@ -232,6 +234,30 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
               {state.published
                 ? "Published — visible on /advice"
                 : "Draft — admin only"}
+            </span>
+          </label>
+
+          <label className="flex items-center gap-3 mb-5">
+            <input
+              type="checkbox"
+              name="isFeatured"
+              checked={state.isFeatured}
+              onChange={(e) => set("isFeatured", e.target.checked)}
+              disabled={!state.published}
+              className="h-4 w-4 rounded border-navy-300 text-navy-900 disabled:opacity-50"
+            />
+            <span
+              className={
+                "text-sm " +
+                (state.published ? "text-navy-900" : "text-navy-400")
+              }
+            >
+              Feature on /advice
+              {!state.published && (
+                <span className="block text-xs text-navy-400 mt-0.5">
+                  (publish first)
+                </span>
+              )}
             </span>
           </label>
 

@@ -18,7 +18,8 @@ function readArticleForm(formData: FormData) {
   const readMinutesStr = String(formData.get("readMinutes") ?? "5");
   const readMinutes = Math.max(1, Number(readMinutesStr) || 5);
   const published = formData.get("published") === "on";
-  return { title, excerpt, body, category, tags, authorName, readMinutes, published };
+  const isFeatured = formData.get("isFeatured") === "on";
+  return { title, excerpt, body, category, tags, authorName, readMinutes, published, isFeatured };
 }
 
 export async function createArticle(formData: FormData) {
