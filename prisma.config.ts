@@ -18,8 +18,11 @@ export default defineConfig({
   migrations: {
     path: path.join("prisma", "migrations"),
   },
+  // Migrations need the direct (non-pooled) connection. Prisma 7 reads
+  // DIRECT_URL automatically when present — we don't need to forward it
+  // here, and the `datasource.directUrl` field isn't part of the public
+  // type. Runtime uses the pooled DATABASE_URL via PrismaPg adapter.
   datasource: {
-    url: process.env.DATABASE_URL,
-    directUrl: process.env.DIRECT_URL,
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL,
   },
 });
