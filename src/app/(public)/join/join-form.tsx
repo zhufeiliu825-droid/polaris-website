@@ -23,14 +23,15 @@ import {
 } from "@/lib/data/options";
 
 /**
- * Dropdown options for the graduation-year field: the current year and the
- * 20 preceding years, plus "Not graduated yet" for current students. Computed
- * at module load so it tracks the real calendar (re-deploys roll it forward).
+ * Dropdown options for the graduation-year field: "Still studying" up top
+ * for current students, then the current year and the 20 preceding years.
+ * Computed at module load so it tracks the real calendar (re-deploys roll
+ * it forward).
  */
 const CURRENT_YEAR = new Date().getFullYear();
 const graduationYears = [
+  "Still studying",
   ...Array.from({ length: 21 }, (_, i) => String(CURRENT_YEAR - i)),
-  "Not graduated yet",
 ];
 
 /**
@@ -387,7 +388,7 @@ export function JoinForm() {
               value={state.graduationYear}
               options={graduationYears}
               onChange={(v) => update("graduationYear", v)}
-              hint='Select "Not graduated yet" if you&apos;re still studying.'
+              hint='Select "Still studying" if you have not graduated yet.'
             />
           </div>
           <Select
@@ -841,7 +842,10 @@ function countFilled(s: FormState): number {
 }
 
 // Number of fields we ask in total — used to compute completeness %.
-const TOTAL_ASKABLE = 25;
+// Keep in sync with countFilled(): 20 strings + 2 arrays = 22. Booleans
+// (privacyAccepted, marketingOptIn) aren't profile signal, so we don't
+// count them. If you add/remove a field above, update this number too.
+const TOTAL_ASKABLE = 22;
 
 function stepIsValid(step: number, s: FormState): boolean {
   if (step === 1) {
