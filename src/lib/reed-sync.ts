@@ -80,10 +80,11 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
       const results = await reedSearchAll(
         {
           keywords: sector.keywords,
-          // UK-wide (no locationName). Permanent + full-time only —
-          // no graduate flag, no part-time, no contract/temp.
+          // UK-wide (no locationName). Permanent + graduate-friendly
+          // only — drops contract/temp + the random non-grad listings
+          // (cleaners, drivers, etc.) that polluted earlier runs.
           permanent: true,
-          fullTime: true,
+          graduate: true,
         },
         TARGET_PER_SECTOR
       );
@@ -118,7 +119,7 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
       {
         keywords: chineseLanguageConfig.keywords,
         permanent: true,
-        fullTime: true,
+        graduate: true,
       },
       CHINESE_TARGET
     );

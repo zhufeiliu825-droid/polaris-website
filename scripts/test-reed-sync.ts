@@ -37,7 +37,7 @@ async function main() {
       {
         keywords: sector.keywords,
         permanent: true,
-        fullTime: true,
+        graduate: true,
       },
       TARGET_PER_SECTOR
     );
