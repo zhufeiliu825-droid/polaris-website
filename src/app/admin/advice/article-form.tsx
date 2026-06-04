@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, Eye, Trash2, FileText, Pencil } from "lucide-react";
+import { Markdown } from "@/components/markdown";
 type ArticleInitial = {
   id: string;
   slug: string;
@@ -159,7 +160,7 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
           {tab === "preview" && (
             <div className="rounded-lg border border-navy-200 bg-navy-50/40 px-6 py-5 min-h-[500px]">
               {state.body.trim() ? (
-                <ArticlePreview markdown={state.body} />
+                <Markdown markdown={state.body} />
               ) : (
                 <p className="text-sm text-navy-500 flex items-center gap-2">
                   <FileText className="h-4 w-4" /> Start writing to see the preview.
@@ -303,115 +304,3 @@ function Field({
   );
 }
 
-/**
- * Minimal Markdown renderer — handles headings, bold/italic, lists, links and
- * paragraphs. Good enough for the editor preview. The public-side article page
- * will use a fuller renderer (e.g. `marked` or `markdown-it`).
- */
-function ArticlePreview({ markdown }: { markdown: string }) {
-  const lines = markdown.split("\n");
-  const elements: React.ReactNode[] = [];
-  let inList = false;
-  let listItems: React.ReactNode[] = [];
-
-  const flushList = () => {
-    if (listItems.length > 0) {
-      elements.push(
-        <ul
-          key={`l${elements.length}`}
-          className="list-disc pl-5 my-3 space-y-1 text-navy-800"
-        >
-          {listItems}
-        </ul>
-      );
-      listItems = [];
-    }
-    inList = false;
-  };
-
-  function inline(s: string): React.ReactNode {
-    // Process **bold**, _italic_, [text](url) sequentially.
-    const out: React.ReactNode[] = [];
-    let rest = s;
-    while (rest.length > 0) {
-      const linkMatch = /\[([^\]]+)\]\(([^)]+)\)/.exec(rest);
-      const boldMatch = /\*\*([^*]+)\*\*/.exec(rest);
-      const italicMatch = /_([^_]+)_/.exec(rest);
-      const candidates = [linkMatch, boldMatch, italicMatch]
-        .map((m, i) => (m ? { m, i, idx: m.index } : null))
-        .filter((x): x is { m: RegExpExecArray; i: number; idx: number } => !!x)
-        .sort((a, b) => a.idx - b.idx);
-      if (candidates.length === 0) {
-        out.push(rest);
-        break;
-      }
-      const first = candidates[0];
-      if (first.idx > 0) out.push(rest.slice(0, first.idx));
-      if (first.i === 0) {
-        out.push(
-          <a
-            key={out.length}
-            href={first.m[2]}
-            className="text-navy-900 underline underline-offset-2"
-          >
-            {first.m[1]}
-          </a>
-        );
-      } else if (first.i === 1) {
-        out.push(<strong key={out.length}>{first.m[1]}</strong>);
-      } else {
-        out.push(<em key={out.length}>{first.m[1]}</em>);
-      }
-      rest = rest.slice(first.idx + first.m[0].length);
-    }
-    return out;
-  }
-
-  for (const line of lines) {
-    if (line.startsWith("# ")) {
-      flushList();
-      elements.push(
-        <h1
-          key={elements.length}
-          className="text-3xl font-light tracking-tight text-navy-950 mt-2 mb-4"
-        >
-          {inline(line.slice(2))}
-        </h1>
-      );
-    } else if (line.startsWith("## ")) {
-      flushList();
-      elements.push(
-        <h2
-          key={elements.length}
-          className="text-xl font-medium tracking-tight text-navy-950 mt-6 mb-3"
-        >
-          {inline(line.slice(3))}
-        </h2>
-      );
-    } else if (line.startsWith("### ")) {
-      flushList();
-      elements.push(
-        <h3 key={elements.length} className="text-lg font-medium text-navy-950 mt-5 mb-2">
-          {inline(line.slice(4))}
-        </h3>
-      );
-    } else if (line.startsWith("- ") || line.startsWith("* ")) {
-      inList = true;
-      listItems.push(<li key={listItems.length}>{inline(line.slice(2))}</li>);
-    } else if (line.trim() === "") {
-      flushList();
-    } else {
-      if (inList) flushList();
-      elements.push(
-        <p
-          key={elements.length}
-          className="text-navy-800 leading-relaxed my-3"
-        >
-          {inline(line)}
-        </p>
-      );
-    }
-  }
-  flushList();
-  return <div className="prose">{elements}</div>;
-}
