@@ -1,6 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Briefcase, Link2, FileText, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  MapPin,
+  Globe2,
+  GraduationCap,
+  Briefcase,
+  Link2,
+  Trash2,
+  Compass,
+  Calendar,
+  CheckCircle2,
+  Tag,
+} from "lucide-react";
 import { prisma } from "@/lib/db";
 import { StatusPill } from "../../page";
 import { Button } from "@/components/ui/button";
@@ -71,21 +85,45 @@ export default async function ApplicationDetailPage({ params }: { params: Params
           <Section title="Contact">
             <Row icon={Mail} label="Email" value={app.email} link={`mailto:${app.email}`} />
             <Row icon={Phone} label="Phone" value={app.phone} link={`tel:${app.phone.replace(/\s/g, "")}`} />
-            <Row icon={MapPin} label="Location" value={`${app.city ?? ""}${app.nationality ? ", " + app.nationality : ""}`} />
+            <Row icon={MapPin} label="Current city" value={app.city} />
+            <Row icon={Globe2} label="Where from" value={app.nationality} />
           </Section>
 
           <Section title="Education">
             <Row icon={GraduationCap} label="University" value={app.university} />
-            <Row label="Course" value={app.course} />
-            <Row label="Year" value={app.yearOfStudy} />
-            <Row label="Graduation year" value={app.graduationYear ? String(app.graduationYear) : null} />
-            <Row label="Academic result" value={app.academicResult} />
+            <Row label="Course / major" value={app.course} />
+            <Row label="Education level" value={app.degreeLevel} />
+            <Row
+              icon={Calendar}
+              label="Graduation year"
+              value={app.graduationYear ? String(app.graduationYear) : null}
+            />
+            <Row label="Prior experience" value={app.experienceLevel} />
+            <Row
+              icon={Link2}
+              label="LinkedIn"
+              value={app.linkedin}
+              link={app.linkedin ?? undefined}
+            />
           </Section>
 
-          <Section title="Goals">
-            <Row label="Target sectors" value={app.targetSectors.join(", ")} />
+          <Section title="Career direction">
+            <Row icon={Compass} label="Career stage" value={app.careerStage} />
+            <Row
+              icon={Tag}
+              label="Target sectors"
+              value={app.targetSectors.length ? app.targetSectors.join(", ") : null}
+            />
+            <Row
+              label="Preferred locations"
+              value={
+                app.preferredLocations.length
+                  ? app.preferredLocations.join(", ")
+                  : null
+              }
+            />
+            <Row icon={Calendar} label="Start timing" value={app.startTiming} />
             <Row icon={Briefcase} label="Programme of interest" value={app.programme} />
-            <Row label="Source" value={app.source} />
           </Section>
 
           {app.notes && (
@@ -96,16 +134,18 @@ export default async function ApplicationDetailPage({ params }: { params: Params
             </Section>
           )}
 
-          {app.cvUrl && (
-            <Section title="CV">
-              <a
-                href={app.cvUrl}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-navy-200 hover:border-navy-900 bg-white text-sm font-medium text-navy-900"
-              >
-                <FileText className="h-4 w-4" /> Download CV
-              </a>
-            </Section>
-          )}
+          <Section title="Consent & source">
+            <Row label="Heard about Polaris via" value={app.source} />
+            <Row
+              icon={CheckCircle2}
+              label="Privacy policy"
+              value={app.privacyAccepted ? "Accepted" : "Not accepted"}
+            />
+            <Row
+              label="Marketing emails"
+              value={app.marketingOptIn ? "Opted in" : "Opted out"}
+            />
+          </Section>
         </div>
 
         <aside>

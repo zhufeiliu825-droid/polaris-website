@@ -73,7 +73,6 @@ type FormState = {
   // Step 5 — Final
   programme: string;
   source: string;
-  cvFileName: string;
   privacyAccepted: boolean;
   marketingOptIn: boolean;
 };
@@ -100,7 +99,6 @@ const initialState: FormState = {
   notes: "",
   programme: "",
   source: "",
-  cvFileName: "",
   privacyAccepted: false,
   marketingOptIn: false,
 };
@@ -466,30 +464,6 @@ export function JoinForm() {
             onChange={(v) => update("source", v)}
           />
 
-          <div>
-            <label className="block text-sm font-medium text-navy-900 mb-2">
-              Upload your CV{" "}
-              <span className="text-navy-500 font-normal">
-                (PDF, optional but recommended)
-              </span>
-            </label>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) update("cvFileName", f.name);
-              }}
-              className="block w-full text-sm text-navy-700 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-navy-50 file:text-navy-900 hover:file:bg-navy-100"
-            />
-            {state.cvFileName && (
-              <p className="mt-2 text-xs text-navy-600 inline-flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-sand-600" />
-                {state.cvFileName} ready to upload
-              </p>
-            )}
-          </div>
-
           <div className="space-y-3 pt-3 border-t border-navy-100">
             <label className="flex items-start gap-3 text-sm text-navy-700">
               <input
@@ -830,7 +804,6 @@ function countFilled(s: FormState): number {
     "notes",
     "programme",
     "source",
-    "cvFileName",
   ] as const) {
     if ((s[k] as string).trim()) n++;
   }
@@ -842,10 +815,10 @@ function countFilled(s: FormState): number {
 }
 
 // Number of fields we ask in total — used to compute completeness %.
-// Keep in sync with countFilled(): 20 strings + 2 arrays = 22. Booleans
+// Keep in sync with countFilled(): 19 strings + 2 arrays = 21. Booleans
 // (privacyAccepted, marketingOptIn) aren't profile signal, so we don't
 // count them. If you add/remove a field above, update this number too.
-const TOTAL_ASKABLE = 22;
+const TOTAL_ASKABLE = 21;
 
 function stepIsValid(step: number, s: FormState): boolean {
   if (step === 1) {

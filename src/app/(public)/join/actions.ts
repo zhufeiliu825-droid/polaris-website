@@ -26,33 +26,57 @@ export async function submitJoin(payload: JoinPayload): Promise<{ id: string }> 
     throw new Error("Please accept the privacy policy");
   }
 
+  // "Graduation year" is a free-text dropdown — most values are numeric
+  // years, but "Still studying" is also valid. We try to coerce to Int
+  // and fall back to null so the form's string makes it intact into the
+  // separate `notes` row for non-numeric responses.
+  const gradYearParsed = payload.graduationYear
+    ? parseInt(payload.graduationYear, 10)
+    : NaN;
+  const gradYearInt = Number.isFinite(gradYearParsed) ? gradYearParsed : null;
+  const gradYearNote =
+    payload.graduationYear && gradYearInt == null
+      ? `Graduation: ${payload.graduationYear}`
+      : null;
+
   const app = await prisma.application.create({
     data: {
+      // Contact
       firstName: payload.firstName.trim(),
       lastName: payload.lastName.trim(),
       email: payload.email.trim().toLowerCase(),
       phone: payload.phone.trim(),
       nationality: payload.nationality || null,
       city: payload.city || null,
+
+      // Education
       degreeLevel: payload.degreeLevel || null,
       university: payload.university || null,
       course: payload.course || null,
-      yearOfStudy: payload.yearOfStudy || null,
-      graduationYear: payload.graduationYear
-        ? parseInt(payload.graduationYear, 10) || null
-        : null,
-      academicResult: payload.academicResult || null,
+      graduationYear: gradYearInt,
+      experienceLevel: payload.experienceLevel || null,
+      linkedin: payload.linkedin || null,
+
+      // Goals
+      careerStage: payload.careerStage || null,
       targetSectors: payload.targetSectors ?? [],
-      programme: payload.programme || null,
       startTiming: payload.startTiming || null,
+      preferredLocations: payload.preferredLocations ?? [],
+      programme: payload.programme || null,
+
+      // Their words — concatenate the open-text fields into notes so the
+      // admin sees them as a single block.
       notes:
         [
+          gradYearNote,
           payload.targetEmployers && `Inspired by: ${payload.targetEmployers}`,
           payload.proudOf && `Proud of: ${payload.proudOf}`,
           payload.notes,
         ]
           .filter(Boolean)
           .join("\n\n") || null,
+
+      // Final
       source: payload.source || null,
       privacyAccepted: payload.privacyAccepted,
       marketingOptIn: !!payload.marketingOptIn,
@@ -104,10 +128,7 @@ export type JoinPayload = {
   degreeLevel?: string;
   university?: string;
   course?: string;
-  yearOfStudy?: string;
   graduationYear?: string;
-  academicResult?: string;
-  spokenLanguages?: string[];
   experienceLevel?: string;
   linkedin?: string;
 
@@ -117,7 +138,6 @@ export type JoinPayload = {
 
   programme?: string;
   source?: string;
-  cvFileName?: string;
   privacyAccepted?: boolean;
   marketingOptIn?: boolean;
 };

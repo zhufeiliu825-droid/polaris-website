@@ -34,14 +34,22 @@ model Application {
   academicResult String?
 
   // Goals
-  targetSectors String[] // multi-select
-  programme     String?
-  startTiming   String?
-  notes         String?  @db.Text
+  careerStage        String?
+  targetSectors      String[]
+  startTiming        String?
+  preferredLocations String[]
+  programme          String?
+
+  // Background
+  experienceLevel String?
+  linkedin        String?
+
+  // Their words (open text — joins targetEmployers / proudOf / notes for now)
+  notes String? @db.Text
 
   // Final
   source          String?
-  cvUrl           String? // Supabase Storage URL
+  cvUrl           String? // Supabase Storage URL — kept nullable; no upload yet.
   privacyAccepted Boolean @default(false)
   marketingOptIn  Boolean @default(false)
 
