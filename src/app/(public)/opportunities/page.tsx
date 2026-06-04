@@ -62,15 +62,17 @@ export default async function OpportunitiesPage({
   const q = (sp.q ?? "").trim();
   const page = Math.max(1, Number(sp.page ?? "1") || 1);
 
-  const { jobs, total, fetchedAt } = listJobs({
-    sectors: selectedSectors.length ? selectedSectors : undefined,
-    chineseOnly,
-    search: q || undefined,
-    limit: PAGE_SIZE,
-    offset: (page - 1) * PAGE_SIZE,
-  });
-  // Sector counts reflect the active language filter.
-  const counts = countsByFilter({ chineseOnly });
+  const [{ jobs, total, fetchedAt }, counts] = await Promise.all([
+    listJobs({
+      sectors: selectedSectors.length ? selectedSectors : undefined,
+      chineseOnly,
+      search: q || undefined,
+      limit: PAGE_SIZE,
+      offset: (page - 1) * PAGE_SIZE,
+    }),
+    // Sector counts reflect the active language filter.
+    countsByFilter({ chineseOnly }),
+  ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const buildHref = (overrides: {

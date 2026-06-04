@@ -18,7 +18,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
-  const job = getJob(id);
+  const job = await getJob(id);
   if (!job) return { title: "Opportunity not found" };
   return {
     title: `${job.jobTitle}${job.employerName ? ` · ${job.employerName}` : ""}`,
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function JobDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const job = getJob(id);
+  const job = await getJob(id);
   if (!job) notFound();
 
   const fmtDate = (iso: string | null) =>

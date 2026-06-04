@@ -1,119 +1,162 @@
 /**
- * Server-side data access for jobs.
+ * Server-side data access for jobs — now Prisma-backed.
  *
- * Reads from data/jobs.json (refreshed via `npm run reed:sync`). When the
- * Postgres-backed sync is wired, swap this for Prisma — the page components
- * don't need to change.
+ * The page components are unchanged from the jobs.json days; we just swapped
+ * the storage layer. Sync is driven by `runReedSync()` on a Vercel Cron
+ * (daily) or via `npm run reed:sync` locally.
  */
 
-import fs from "node:fs";
-import path from "node:path";
-import type { StoredJob, StoredSnapshot } from "../../scripts/reed-sync";
+import { prisma } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 
-let cache: { mtimeMs: number; snapshot: StoredSnapshot } | null = null;
-
-function loadSnapshot(): StoredSnapshot {
-  const file = path.join(process.cwd(), "data", "jobs.json");
-  if (!fs.existsSync(file)) {
-    return {
-      fetchedAt: new Date(0).toISOString(),
-      totalJobs: 0,
-      totalApiCalls: 0,
-      durationSeconds: 0,
-      perSectorCounts: {},
-      chineseSpeakingCount: 0,
-      jobs: [],
-    };
-  }
-  const stat = fs.statSync(file);
-  if (!cache || cache.mtimeMs !== stat.mtimeMs) {
-    const raw = fs.readFileSync(file, "utf8");
-    cache = { mtimeMs: stat.mtimeMs, snapshot: JSON.parse(raw) };
-  }
-  return cache.snapshot;
-}
+export type StoredJob = {
+  id: string;
+  sectors: string[];
+  isChineseSpeaking: boolean;
+  jobTitle: string;
+  employerName: string | null;
+  locationName: string | null;
+  minSalary: number | null;
+  maxSalary: number | null;
+  currency: string | null;
+  expirationDate: string | null;
+  postedAt: string | null;
+  description: string;
+  jobUrl: string;
+  applications: number;
+};
 
 export type JobFilter = {
-  sectors?: string[]; // filter to these sectors
-  chineseOnly?: boolean; // filter to Chinese-speaking only
+  sectors?: string[];
+  chineseOnly?: boolean;
   search?: string;
   limit?: number;
   offset?: number;
 };
 
-export function listJobs(filter: JobFilter = {}): {
+function toStoredJob(j: {
+  id: string;
+  sectors: string[];
+  isChineseSpeaking: boolean;
+  jobTitle: string;
+  employerName: string | null;
+  locationName: string | null;
+  minSalary: number | null;
+  maxSalary: number | null;
+  currency: string | null;
+  expirationDate: Date | null;
+  postedAt: Date | null;
+  description: string;
+  jobUrl: string | null;
+  applications: number;
+}): StoredJob {
+  return {
+    id: j.id,
+    sectors: j.sectors,
+    isChineseSpeaking: j.isChineseSpeaking,
+    jobTitle: j.jobTitle,
+    employerName: j.employerName,
+    locationName: j.locationName,
+    minSalary: j.minSalary,
+    maxSalary: j.maxSalary,
+    currency: j.currency,
+    expirationDate: j.expirationDate?.toISOString() ?? null,
+    postedAt: j.postedAt?.toISOString() ?? null,
+    description: j.description,
+    jobUrl: j.jobUrl ?? "",
+    applications: j.applications,
+  };
+}
+
+export async function listJobs(filter: JobFilter = {}): Promise<{
   jobs: StoredJob[];
   total: number;
   fetchedAt: string;
-} {
-  const snap = loadSnapshot();
-  let filtered = snap.jobs;
-
+}> {
+  const where: Prisma.JobWhereInput = {
+    isActive: true,
+  };
   if (filter.sectors && filter.sectors.length > 0) {
-    const allow = new Set(filter.sectors);
-    filtered = filtered.filter((j) => j.sectors.some((s) => allow.has(s)));
+    where.sectors = { hasSome: filter.sectors };
   }
   if (filter.chineseOnly) {
-    filtered = filtered.filter((j) => j.isChineseSpeaking);
+    where.isChineseSpeaking = true;
   }
   if (filter.search) {
-    const q = filter.search.toLowerCase().trim();
-    filtered = filtered.filter(
-      (j) =>
-        j.jobTitle.toLowerCase().includes(q) ||
-        (j.employerName ?? "").toLowerCase().includes(q)
-    );
+    const q = filter.search.trim();
+    where.OR = [
+      { jobTitle: { contains: q, mode: "insensitive" } },
+      { employerName: { contains: q, mode: "insensitive" } },
+    ];
   }
-  filtered = [...filtered].sort((a, b) => {
-    const da = a.postedAt ? new Date(a.postedAt).getTime() : 0;
-    const db = b.postedAt ? new Date(b.postedAt).getTime() : 0;
-    return db - da;
-  });
 
-  const total = filtered.length;
-  const offset = filter.offset ?? 0;
-  const limit = filter.limit ?? 30;
-  const jobs = filtered.slice(offset, offset + limit);
-  return { jobs, total, fetchedAt: snap.fetchedAt };
+  const [rows, total, latest] = await Promise.all([
+    prisma.job.findMany({
+      where,
+      orderBy: [{ postedAt: "desc" }, { lastSeenAt: "desc" }],
+      take: filter.limit ?? 30,
+      skip: filter.offset ?? 0,
+    }),
+    prisma.job.count({ where }),
+    prisma.jobSyncRun.findFirst({
+      where: { ok: true },
+      orderBy: { endedAt: "desc" },
+      select: { endedAt: true },
+    }),
+  ]);
+
+  return {
+    jobs: rows.map(toStoredJob),
+    total,
+    fetchedAt: latest?.endedAt?.toISOString() ?? new Date(0).toISOString(),
+  };
 }
 
-export function getJob(id: string): StoredJob | null {
-  const snap = loadSnapshot();
-  return snap.jobs.find((j) => j.id === id) ?? null;
+export async function getJob(id: string): Promise<StoredJob | null> {
+  const row = await prisma.job.findUnique({ where: { id } });
+  return row ? toStoredJob(row) : null;
 }
 
-/**
- * Returns counts considering the active language filter — so that when
- * "Chinese-speaking only" is on, sector counts show the Chinese subset.
- */
-export function countsByFilter(filter: { chineseOnly?: boolean } = {}): {
+export async function countsByFilter(filter: { chineseOnly?: boolean } = {}): Promise<{
   perSectorCounts: Record<string, number>;
   total: number;
   chineseSpeakingCount: number;
   fetchedAt: string;
-} {
-  const snap = loadSnapshot();
-  const pool = filter.chineseOnly
-    ? snap.jobs.filter((j) => j.isChineseSpeaking)
-    : snap.jobs;
+}> {
+  const where: Prisma.JobWhereInput = {
+    isActive: true,
+  };
+  if (filter.chineseOnly) where.isChineseSpeaking = true;
+
+  const [rows, total, chineseSpeakingCount, latest] = await Promise.all([
+    prisma.job.findMany({
+      where,
+      select: { sectors: true },
+    }),
+    prisma.job.count({ where }),
+    prisma.job.count({ where: { isActive: true, isChineseSpeaking: true } }),
+    prisma.jobSyncRun.findFirst({
+      where: { ok: true },
+      orderBy: { endedAt: "desc" },
+      select: { endedAt: true },
+    }),
+  ]);
+
   const perSectorCounts: Record<string, number> = {};
-  for (const j of pool) {
-    for (const s of j.sectors) {
+  for (const r of rows) {
+    for (const s of r.sectors) {
       perSectorCounts[s] = (perSectorCounts[s] ?? 0) + 1;
     }
   }
   return {
     perSectorCounts,
-    total: pool.length,
-    chineseSpeakingCount: snap.chineseSpeakingCount,
-    fetchedAt: snap.fetchedAt,
+    total,
+    chineseSpeakingCount,
+    fetchedAt: latest?.endedAt?.toISOString() ?? new Date(0).toISOString(),
   };
 }
 
-/** Convenience for the admin dashboard tile — same as countsByFilter() with no args. */
-export function jobsMetadata() {
-  const { total, fetchedAt, perSectorCounts } = countsByFilter();
+export async function jobsMetadata() {
+  const { total, fetchedAt, perSectorCounts } = await countsByFilter();
   return { total, fetchedAt, perSectorCounts };
 }
-
-export type { StoredJob };

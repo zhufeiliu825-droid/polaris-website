@@ -1,0 +1,299 @@
+/**
+ * Reed → Postgres sync. Callable from both the CLI script
+ * (`scripts/reed-sync.ts`) and the Vercel Cron API route.
+ *
+ * Two-stage fetch:
+ *   1. 6 sector searches (graduate-filtered), each tagging results with that
+ *      sector. Multi-matching jobs accumulate sectors.
+ *   2. Chinese-language catchall — auto-classifies each result into one of
+ *      the 6 sectors and flags `isChineseSpeaking: true`.
+ *
+ * Then upserts every fetched job into the Job table, and marks Jobs that
+ * weren't returned this run as inactive (cheap soft-delete — they keep
+ * surfacing in admin views but disappear from the public list).
+ */
+
+import { prisma } from "@/lib/db";
+import { reedSearchAll, cleanReedDescription, parseReedDate } from "@/lib/reed";
+import {
+  reedSectors,
+  chineseLanguageConfig,
+  classifySectorFromText,
+  type SectorKey,
+} from "@/lib/site";
+
+export type SyncResult = {
+  ok: boolean;
+  startedAt: string;
+  endedAt: string;
+  durationSeconds: number;
+  totalFetched: number;
+  totalUpserted: number;
+  totalDeactivated: number;
+  apiCalls: number;
+  perSectorCounts: Record<string, number>;
+  chineseSpeakingCount: number;
+  error?: string;
+};
+
+const CHINESE_REGEX = /\b(chinese|mandarin|cantonese)\b/i;
+
+const TARGET_PER_SECTOR = 100;
+const CHINESE_TARGET = 200;
+
+type StagedJob = {
+  id: string;
+  jobTitle: string;
+  employerId: number | null;
+  employerName: string | null;
+  employerProfileId: number | null;
+  description: string;
+  locationName: string | null;
+  minSalary: number | null;
+  maxSalary: number | null;
+  currency: string | null;
+  sectors: string[];
+  isChineseSpeaking: boolean;
+  postedAt: Date | null;
+  expirationDate: Date | null;
+  jobUrl: string | null;
+  externalUrl: string | null;
+  applications: number;
+};
+
+export async function runReedSync(options: { log?: (msg: string) => void } = {}): Promise<SyncResult> {
+  const log = options.log ?? ((m) => console.log(m));
+  const startedAt = new Date();
+  const t0 = Date.now();
+  const byId = new Map<string, StagedJob>();
+  let apiCalls = 0;
+
+  try {
+    // ─── Stage 1: 6 sector searches ──────────────────────────────
+    for (const sector of reedSectors) {
+      const sectorStart = Date.now();
+      const results = await reedSearchAll(
+        {
+          keywords: sector.keywords,
+          locationName: "london",
+          graduate: sector.graduate,
+          fullTime: true,
+        },
+        TARGET_PER_SECTOR
+      );
+      apiCalls += Math.ceil(results.length / 100) || 1;
+
+      let newCount = 0;
+      let dupCount = 0;
+      let chineseTagged = 0;
+      for (const j of results) {
+        const id = String(j.jobId);
+        const description = cleanReedDescription(j.jobDescription);
+        const isCh = CHINESE_REGEX.test(j.jobTitle) || CHINESE_REGEX.test(description);
+        if (isCh) chineseTagged++;
+        const existing = byId.get(id);
+        if (existing) {
+          if (!existing.sectors.includes(sector.key)) existing.sectors.push(sector.key);
+          if (isCh) existing.isChineseSpeaking = true;
+          dupCount++;
+        } else {
+          byId.set(id, stage(j, [sector.key], isCh, description));
+          newCount++;
+        }
+      }
+      log(
+        `  ${sector.key.padEnd(13)} ${String(results.length).padStart(3)} returned · ${newCount} new, ${dupCount} also-matched · ${chineseTagged} CN · ${((Date.now() - sectorStart) / 1000).toFixed(1)}s`
+      );
+    }
+
+    // ─── Stage 2: Chinese catchall ──────────────────────────────
+    const chineseStart = Date.now();
+    const chineseResults = await reedSearchAll(
+      {
+        keywords: chineseLanguageConfig.keywords,
+        locationName: "london",
+        graduate: chineseLanguageConfig.graduate,
+      },
+      CHINESE_TARGET
+    );
+    apiCalls += Math.ceil(chineseResults.length / 100) || 1;
+
+    let added = 0;
+    let flagged = 0;
+    for (const j of chineseResults) {
+      const id = String(j.jobId);
+      const description = cleanReedDescription(j.jobDescription);
+      const existing = byId.get(id);
+      if (existing) {
+        if (!existing.isChineseSpeaking) {
+          existing.isChineseSpeaking = true;
+          flagged++;
+        }
+        continue;
+      }
+      const classified = classifySectorFromText(j.jobTitle + " " + description.slice(0, 200));
+      byId.set(id, stage(j, [classified], true, description));
+      added++;
+    }
+    log(
+      `  ${"Chinese".padEnd(13)} ${String(chineseResults.length).padStart(3)} returned · ${added} new, ${flagged} flag-only · ${((Date.now() - chineseStart) / 1000).toFixed(1)}s`
+    );
+
+    // ─── Persist ────────────────────────────────────────────────
+    const jobs = [...byId.values()];
+    const now = new Date();
+
+    // Upsert one row at a time. We could batch, but 500-ish rows finishes
+    // well within Vercel's serverless timeout and the simpler code wins.
+    let upserted = 0;
+    for (const j of jobs) {
+      await prisma.job.upsert({
+        where: { id: j.id },
+        create: {
+          id: j.id,
+          jobTitle: j.jobTitle,
+          employerId: j.employerId,
+          employerName: j.employerName,
+          employerProfileId: j.employerProfileId,
+          description: j.description,
+          locationName: j.locationName,
+          minSalary: j.minSalary,
+          maxSalary: j.maxSalary,
+          currency: j.currency,
+          sectors: j.sectors,
+          isChineseSpeaking: j.isChineseSpeaking,
+          postedAt: j.postedAt,
+          expirationDate: j.expirationDate,
+          jobUrl: j.jobUrl,
+          externalUrl: j.externalUrl,
+          applications: j.applications,
+          isActive: true,
+          firstSeenAt: now,
+          lastSeenAt: now,
+        },
+        update: {
+          jobTitle: j.jobTitle,
+          employerName: j.employerName,
+          description: j.description,
+          locationName: j.locationName,
+          minSalary: j.minSalary,
+          maxSalary: j.maxSalary,
+          currency: j.currency,
+          sectors: j.sectors,
+          isChineseSpeaking: j.isChineseSpeaking,
+          postedAt: j.postedAt,
+          expirationDate: j.expirationDate,
+          jobUrl: j.jobUrl,
+          applications: j.applications,
+          isActive: true,
+          lastSeenAt: now,
+        },
+      });
+      upserted++;
+    }
+
+    // Mark jobs we didn't see this run as inactive.
+    const seenIds = Array.from(byId.keys());
+    const deactivated = await prisma.job.updateMany({
+      where: {
+        isActive: true,
+        id: { notIn: seenIds.length ? seenIds : ["__never__"] },
+      },
+      data: { isActive: false },
+    });
+
+    // ─── Compute metrics ────────────────────────────────────────
+    const perSectorCounts: Record<string, number> = {};
+    let chineseCount = 0;
+    for (const j of jobs) {
+      for (const s of j.sectors) {
+        perSectorCounts[s] = (perSectorCounts[s] ?? 0) + 1;
+      }
+      if (j.isChineseSpeaking) chineseCount++;
+    }
+
+    const endedAt = new Date();
+    const result: SyncResult = {
+      ok: true,
+      startedAt: startedAt.toISOString(),
+      endedAt: endedAt.toISOString(),
+      durationSeconds: (Date.now() - t0) / 1000,
+      totalFetched: jobs.length,
+      totalUpserted: upserted,
+      totalDeactivated: deactivated.count,
+      apiCalls,
+      perSectorCounts,
+      chineseSpeakingCount: chineseCount,
+    };
+
+    // Log the run.
+    await prisma.jobSyncRun.create({
+      data: {
+        startedAt,
+        endedAt,
+        ok: true,
+        sectorsRun: reedSectors.map((s) => s.key),
+        jobsFetched: result.totalFetched,
+        jobsAdded: 0, // we'd need pre/post counts to split out; skipping for now
+        jobsUpdated: result.totalUpserted,
+        jobsExpired: result.totalDeactivated,
+        apiCalls: result.apiCalls,
+      },
+    });
+
+    return result;
+  } catch (e) {
+    const error = e instanceof Error ? e.message + "\n" + (e.stack ?? "") : String(e);
+    const endedAt = new Date();
+    await prisma.jobSyncRun.create({
+      data: {
+        startedAt,
+        endedAt,
+        ok: false,
+        sectorsRun: reedSectors.map((s) => s.key),
+        apiCalls,
+        errorLog: error,
+      },
+    });
+    return {
+      ok: false,
+      startedAt: startedAt.toISOString(),
+      endedAt: endedAt.toISOString(),
+      durationSeconds: (Date.now() - t0) / 1000,
+      totalFetched: byId.size,
+      totalUpserted: 0,
+      totalDeactivated: 0,
+      apiCalls,
+      perSectorCounts: {},
+      chineseSpeakingCount: 0,
+      error,
+    };
+  }
+}
+
+function stage(
+  j: Awaited<ReturnType<typeof reedSearchAll>>[number],
+  sectors: SectorKey[],
+  isChineseSpeaking: boolean,
+  description: string
+): StagedJob {
+  return {
+    id: String(j.jobId),
+    jobTitle: j.jobTitle,
+    employerId: j.employerId,
+    employerName: j.employerName,
+    employerProfileId: j.employerProfileId,
+    description,
+    locationName: j.locationName,
+    minSalary: j.minimumSalary,
+    maxSalary: j.maximumSalary,
+    currency: j.currency,
+    sectors,
+    isChineseSpeaking,
+    postedAt: parseReedDate(j.date),
+    expirationDate: parseReedDate(j.expirationDate),
+    jobUrl: j.jobUrl,
+    externalUrl: null,
+    applications: j.applications,
+  };
+}

@@ -79,36 +79,33 @@ model Job {
   locationName      String?
   minSalary         Int?
   maxSalary         Int?
+  currency          String?
 
   // Polaris classification
-  sector     String  // one of our 6: Finance/Accounting/Consulting/Engineering/Law/Marketing
-  isGraduate Boolean @default(true)
-  isFeatured Boolean @default(false) // pinned by admin
+  sectors           String[] // one or more of: Finance/Accounting/Consulting/Engineering/Law/Marketing
+  isChineseSpeaking Boolean  @default(false)
+  isGraduate        Boolean  @default(true)
+  isFeatured        Boolean  @default(false) // pinned by admin
 
-  // Fields from details endpoint (lazy fetched)
-  yearlyMinSalary  Int?
-  yearlyMaxSalary  Int?
-  currency         String?    // "GBP"
-  salaryType       String?    // "Annual"
-  contractType     String?    // "Permanent" / "Contract" / "Temporary"
-  jobType          String?    // "FullTime" / "PartTime"
-  expirationDate   DateTime?
-  externalUrl      String?    // employer's own apply URL
-  jobUrl           String?    // reed.co.uk page URL
-  detailsFetchedAt DateTime?
+  // Reed dates
+  postedAt       DateTime?
+  expirationDate DateTime?
+
+  // Reed URLs + counts
+  jobUrl       String?
+  externalUrl  String?
+  applications Int @default(0)
 
   // Sync bookkeeping
-  raw            Json? // full Reed payload, for forward-compat
-  isActive       Boolean  @default(true)
-  firstSeenAt    DateTime @default(now())
-  lastSeenAt     DateTime @default(now()) // updated on each sync that returns this job
-  missingCycles  Int      @default(0)     // incremented when sync doesn't return it; 3 → isActive=false
+  isActive    Boolean  @default(true)
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now()) // updated on each sync that returns this job
 
-  @@index([sector])
   @@index([locationName])
   @@index([isActive])
   @@index([isFeatured])
   @@index([expirationDate])
+  @@index([postedAt])
 }
 
 // ───────────────────────────────────────────────────────────────

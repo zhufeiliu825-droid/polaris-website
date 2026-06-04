@@ -27,7 +27,7 @@ export default async function AdminHomePage() {
     }),
   ]);
 
-  const jobs = jobsMetadata();
+  const jobs = await jobsMetadata();
 
   const tiles = [
     {
