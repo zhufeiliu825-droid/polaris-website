@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { EventForm } from "../event-form";
 import { updateEvent, deleteEvent } from "../actions";
@@ -32,16 +32,28 @@ export default async function EditEventPage({
         <ArrowLeft className="h-4 w-4" /> All events
       </Link>
       {saved && <SavedBanner />}
-      <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
-        {event.title}
-      </h1>
-      <p className="text-navy-600 mb-8">
-        {event.registrationsCount} people registered · created{" "}
-        {event.createdAt.toLocaleDateString("en-GB", { dateStyle: "long" })}
-      </p>
+      <div className="flex items-start justify-between gap-6 flex-wrap mb-8">
+        <div>
+          <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
+            {event.title}
+          </h1>
+          <p className="text-navy-600">
+            {event.registrationsCount} people registered · created{" "}
+            {event.createdAt.toLocaleDateString("en-GB", { dateStyle: "long" })}
+          </p>
+        </div>
+        <form action={deleteEvent}>
+          <input type="hidden" name="id" value={event.id} />
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </button>
+        </form>
+      </div>
       <EventForm
         action={updateEvent}
-        deleteAction={deleteEvent}
         initial={{
           id: event.id,
           slug: event.slug,
@@ -56,7 +68,6 @@ export default async function EditEventPage({
           format: event.format === "ONLINE" ? "ONLINE" : "IN_PERSON",
           location: event.location,
           sector: event.sector ?? null,
-          capacity: event.capacity,
           registrationsCount: event.registrationsCount,
           registrationUrl: event.registrationUrl ?? "",
           published: event.published,

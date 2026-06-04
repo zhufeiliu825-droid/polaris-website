@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Users, Calendar, BookOpen, ArrowRight, Briefcase } from "lucide-react";
+import { Users, Calendar, BookOpen, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { jobsMetadata } from "@/lib/jobs";
 
 export const metadata = { title: "Admin · Dashboard" };
 
@@ -27,8 +26,6 @@ export default async function AdminHomePage() {
     }),
   ]);
 
-  const jobs = await jobsMetadata();
-
   const tiles = [
     {
       href: "/admin/applications",
@@ -52,14 +49,6 @@ export default async function AdminHomePage() {
       title: "Advice articles",
       count: String(articles),
       sub: `${publishedArticles} published · ${articles - publishedArticles} draft`,
-      accent: "text-navy-400",
-    },
-    {
-      href: "/opportunities",
-      icon: Briefcase,
-      title: "Opportunities (Reed)",
-      count: String(jobs.total),
-      sub: "Synced automatically",
       accent: "text-navy-400",
     },
   ];

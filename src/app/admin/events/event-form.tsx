@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Save, Eye, Trash2 } from "lucide-react";
+import { Save, Eye } from "lucide-react";
 
 type EventInitial = {
   id: string;
@@ -15,7 +15,6 @@ type EventInitial = {
   format: "ONLINE" | "IN_PERSON";
   location: string;
   sector: string | null;
-  capacity: number | null;
   registrationsCount?: number;
   registrationUrl: string;
   published: boolean;
@@ -26,10 +25,9 @@ type Props = {
   initial?: EventInitial;
   isEdit?: boolean;
   action: (formData: FormData) => Promise<void> | void;
-  deleteAction?: (formData: FormData) => Promise<void> | void;
 };
 
-export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
+export function EventForm({ initial, isEdit, action }: Props) {
   const [state, setState] = useState({
     title: initial?.title ?? "",
     slug: initial?.slug ?? "",
@@ -40,7 +38,6 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
     format: (initial?.format ?? "ONLINE") as "ONLINE" | "IN_PERSON",
     location: initial?.location ?? "",
     sector: initial?.sector ?? "",
-    capacity: initial?.capacity ? String(initial.capacity) : "",
     registrationUrl: initial?.registrationUrl ?? "",
     published: initial?.published ?? false,
   });
@@ -204,18 +201,7 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
         </Section>
 
         <Section title="Registration">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Capacity (optional)">
-              <input
-                type="number"
-                name="capacity"
-                min="0"
-                value={state.capacity}
-                onChange={(e) => set("capacity", e.target.value)}
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
-              />
-            </Field>
-            <Field label="External registration URL" hint="Leave blank to use Polaris on-site form.">
+          <Field label="External registration URL" hint="Leave blank if there's no third-party signup yet — no Register button will be shown.">
               <input
                 type="url"
                 name="registrationUrl"
@@ -225,7 +211,6 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
                 className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
               />
             </Field>
-          </div>
         </Section>
       </div>
 
@@ -284,20 +269,6 @@ export function EventForm({ initial, isEdit, action, deleteAction }: Props) {
           )}
         </div>
 
-        {isEdit && initial?.id && deleteAction && (
-          <button
-            type="submit"
-            formAction={deleteAction}
-            onClick={(e) => {
-              if (!confirm("Delete this event? This cannot be undone.")) {
-                e.preventDefault();
-              }
-            }}
-            className="w-full inline-flex items-center justify-center gap-2 h-10 px-4 rounded-full border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" /> Delete event
-          </button>
-        )}
       </aside>
     </form>
   );

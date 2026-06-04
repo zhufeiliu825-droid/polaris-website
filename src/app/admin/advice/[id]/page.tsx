@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { ArticleForm } from "../article-form";
 import { updateArticle, deleteArticle } from "../actions";
@@ -32,17 +32,29 @@ export default async function EditArticlePage({
         <ArrowLeft className="h-4 w-4" /> All articles
       </Link>
       {saved && <SavedBanner />}
-      <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
-        {article.title}
-      </h1>
-      <p className="text-navy-600 mb-8">
-        {article.published && article.publishedAt
-          ? `Published ${article.publishedAt.toLocaleDateString("en-GB", { dateStyle: "long" })}`
-          : `Draft since ${article.createdAt.toLocaleDateString("en-GB", { dateStyle: "long" })}`}
-      </p>
+      <div className="flex items-start justify-between gap-6 flex-wrap mb-8">
+        <div>
+          <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
+            {article.title}
+          </h1>
+          <p className="text-navy-600">
+            {article.published && article.publishedAt
+              ? `Published ${article.publishedAt.toLocaleDateString("en-GB", { dateStyle: "long" })}`
+              : `Draft since ${article.createdAt.toLocaleDateString("en-GB", { dateStyle: "long" })}`}
+          </p>
+        </div>
+        <form action={deleteArticle}>
+          <input type="hidden" name="id" value={article.id} />
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </button>
+        </form>
+      </div>
       <ArticleForm
         action={updateArticle}
-        deleteAction={deleteArticle}
         initial={{
           id: article.id,
           slug: article.slug,

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Save, Eye, Trash2, FileText, Pencil } from "lucide-react";
+import { Save, Eye, FileText, Pencil } from "lucide-react";
 import { Markdown } from "@/components/markdown";
 type ArticleInitial = {
   id: string;
@@ -33,10 +33,9 @@ type Props = {
   initial?: ArticleInitial;
   isEdit?: boolean;
   action: (formData: FormData) => Promise<void> | void;
-  deleteAction?: (formData: FormData) => Promise<void> | void;
 };
 
-export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
+export function ArticleForm({ initial, isEdit, action }: Props) {
   const [state, setState] = useState({
     title: initial?.title ?? "",
     slug: initial?.slug ?? "",
@@ -296,20 +295,6 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
             </a>
           )}
 
-          {isEdit && initial?.id && deleteAction && (
-            <button
-              type="submit"
-              formAction={deleteAction}
-              onClick={(e) => {
-                if (!confirm("Delete this article? This cannot be undone.")) {
-                  e.preventDefault();
-                }
-              }}
-              className="mt-3 w-full inline-flex items-center justify-center gap-2 h-10 px-4 rounded-full border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4" /> Delete article
-            </button>
-          )}
         </div>
       </aside>
     </form>

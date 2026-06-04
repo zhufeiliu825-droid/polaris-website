@@ -66,8 +66,6 @@ function readEventForm(formData: FormData) {
   const format = parseFormat(String(formData.get("format") ?? ""));
   const location = String(formData.get("location") ?? "").trim();
   const sector = String(formData.get("sector") ?? "").trim() || null;
-  const capacityStr = String(formData.get("capacity") ?? "").trim();
-  const capacity = capacityStr ? Number(capacityStr) : null;
   const registrationUrl =
     String(formData.get("registrationUrl") ?? "").trim() || null;
   const published = formData.get("published") === "on";
@@ -80,7 +78,7 @@ function readEventForm(formData: FormData) {
     format,
     location,
     sector,
-    capacity,
+    capacity: null,
     registrationUrl,
     published,
   };
