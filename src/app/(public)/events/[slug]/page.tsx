@@ -97,33 +97,24 @@ export default async function EventDetailPage({ params }: PageProps) {
                     <p className="text-navy-600">{e.location}</p>
                   </div>
                 </div>
-                {/* Past events: surface a small "This event has ended" note
-                    instead of a now-pointless registration CTA. */}
+                {/* Past events: ended note.
+                    Future events: only show the Register button when there's
+                    a real external URL (e.g. Eventbrite) attached to the
+                    event in the admin. No fake "Register interest" CTA. */}
                 {isPast ? (
                   <div className="pt-2 text-sm text-navy-500 text-center bg-navy-50 rounded-lg py-3">
                     This event has ended.
                   </div>
-                ) : (
-                  <div className="pt-2">
-                    {e.registrationUrl ? (
-                      <a
-                        href={e.registrationUrl}
-                        target="_blank"
-                        rel="noopener"
-                        className="w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full bg-navy-950 text-white text-sm font-medium hover:bg-navy-800"
-                      >
-                        Register
-                      </a>
-                    ) : (
-                      <Link
-                        href="/contact"
-                        className="w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full bg-navy-950 text-white text-sm font-medium hover:bg-navy-800"
-                      >
-                        Register interest
-                      </Link>
-                    )}
-                  </div>
-                )}
+                ) : e.registrationUrl ? (
+                  <a
+                    href={e.registrationUrl}
+                    target="_blank"
+                    rel="noopener"
+                    className="mt-2 w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full bg-navy-950 text-white text-sm font-medium hover:bg-navy-800"
+                  >
+                    Register
+                  </a>
+                ) : null}
               </div>
             </aside>
           </div>

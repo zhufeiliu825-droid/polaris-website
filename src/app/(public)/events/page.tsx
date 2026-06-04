@@ -20,8 +20,11 @@ const FORMAT_OPTIONS = [
   { key: "online", label: "Online" },
   { key: "in-person", label: "In person" },
 ] as const;
+/**
+ * Time chip — only Ongoing and Past. No "All" option because everything is
+ * always one of the two; Ongoing is the default when no URL param is set.
+ */
 const WHEN_OPTIONS = [
-  { key: "all", label: "All time" },
   { key: "ongoing", label: "Ongoing" },
   { key: "past", label: "Past" },
 ] as const;
@@ -33,8 +36,8 @@ function buildWhere(format: FormatKey, when: WhenKey, now: Date): Prisma.EventWh
   const where: Prisma.EventWhereInput = { published: true };
   if (format === "online") where.format = "ONLINE";
   if (format === "in-person") where.format = "IN_PERSON";
-  if (when === "ongoing") where.endsAt = { gte: now };
   if (when === "past") where.endsAt = { lt: now };
+  else where.endsAt = { gte: now }; // "ongoing"
   return where;
 }
 
@@ -66,7 +69,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
   const activeFormat: FormatKey =
     sp.format && validFormats.has(sp.format) ? (sp.format as FormatKey) : "all";
   const activeWhen: WhenKey =
-    sp.when && validWhens.has(sp.when) ? (sp.when as WhenKey) : "all";
+    sp.when && validWhens.has(sp.when) ? (sp.when as WhenKey) : "ongoing";
 
   const now = new Date();
   const where = buildWhere(activeFormat, activeWhen, now);
@@ -79,14 +82,15 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
 
   /**
    * Builds the href for a chip in a given axis. Keeps the other axis's
-   * active value intact. The "all" key clears that axis's URL param.
+   * active value intact. Defaults (format=all, when=ongoing) are encoded
+   * as missing URL params so /events stays canonical.
    */
   const hrefFor = (axis: "format" | "when", key: string) => {
     const next = new URLSearchParams();
     const f = axis === "format" ? key : activeFormat;
     const w = axis === "when" ? key : activeWhen;
     if (f !== "all") next.set("format", f);
-    if (w !== "all") next.set("when", w);
+    if (w !== "ongoing") next.set("when", w);
     const s = next.toString();
     return s ? `/events?${s}` : "/events";
   };
@@ -120,9 +124,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
               <p className="text-navy-600">
                 {activeWhen === "past"
                   ? "No past events to show."
-                  : activeWhen === "ongoing"
-                    ? "Nothing on the calendar right now — check back soon."
-                    : "No events match these filters."}
+                  : "Nothing on the calendar right now — check back soon."}
               </p>
             </div>
           ) : (
