@@ -64,7 +64,7 @@ export default function Home() {
               consulting, technology, law and beyond.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <ButtonLink href="/contact" variant="secondary" size="lg">
+              <ButtonLink href="/join#form" variant="secondary" size="lg">
                 Get in touch <ArrowRight className="h-4 w-4" />
               </ButtonLink>
               <ButtonLink
@@ -223,16 +223,9 @@ export default function Home() {
                 mentor will be in touch within five working days.
               </p>
             </div>
-            <div className="lg:justify-self-end flex flex-col sm:flex-row gap-4">
-              <ButtonLink href="/contact" variant="secondary" size="lg">
+            <div className="lg:justify-self-end">
+              <ButtonLink href="/join#form" variant="secondary" size="lg">
                 Get in touch <ArrowRight className="h-4 w-4" />
-              </ButtonLink>
-              <ButtonLink
-                href="/contact"
-                size="lg"
-                className="bg-transparent text-white hover:bg-white hover:text-navy-900 border border-white"
-              >
-                Talk to us
               </ButtonLink>
             </div>
           </div>

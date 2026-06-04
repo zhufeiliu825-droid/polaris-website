@@ -21,7 +21,10 @@ export default function JoinPage() {
         subtitle="The more we know, the better we can match you with the right mentor and opportunities. Most people finish in under five minutes."
       />
 
-      <section className="py-16 md:py-20 bg-paper">
+      {/* id="form" — landing target for "Get in touch" / Join CTA buttons
+          elsewhere on the site, so /join#form scrolls past the intro and
+          drops the user straight into the form. */}
+      <section id="form" className="py-16 md:py-20 bg-paper scroll-mt-4">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <aside className="lg:col-span-4 lg:sticky lg:top-24 self-start space-y-8">
