@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { EventForm } from "../event-form";
 import { updateEvent, deleteEvent } from "../actions";
+import { SavedBanner } from "../../saved-banner";
 
 export const metadata = { title: "Admin · Edit event" };
 
@@ -30,11 +31,7 @@ export default async function EditEventPage({
       >
         <ArrowLeft className="h-4 w-4" /> All events
       </Link>
-      {saved && (
-        <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-          Changes saved.
-        </div>
-      )}
+      {saved && <SavedBanner />}
       <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
         {event.title}
       </h1>

@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { ArticleForm } from "../article-form";
 import { updateArticle, deleteArticle } from "../actions";
+import { SavedBanner } from "../../saved-banner";
 
 export const metadata = { title: "Admin · Edit article" };
 
@@ -30,11 +31,7 @@ export default async function EditArticlePage({
       >
         <ArrowLeft className="h-4 w-4" /> All articles
       </Link>
-      {saved && (
-        <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-          Changes saved.
-        </div>
-      )}
+      {saved && <SavedBanner />}
       <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
         {article.title}
       </h1>

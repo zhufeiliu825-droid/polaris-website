@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { StatusPill } from "../../page";
 import { Button } from "@/components/ui/button";
 import { updateApplication, deleteApplication } from "../actions";
+import { SavedBanner } from "../../saved-banner";
 import {
   nationalities,
   sectors,
@@ -69,11 +70,7 @@ export default async function ApplicationDetailPage({
         <ArrowLeft className="h-4 w-4" /> All applications
       </Link>
 
-      {saved && (
-        <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-          Changes saved.
-        </div>
-      )}
+      {saved && <SavedBanner />}
 
       <div className="flex items-start justify-between gap-6 flex-wrap mb-8">
         <div className="flex items-start gap-5">
