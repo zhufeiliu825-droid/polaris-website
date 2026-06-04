@@ -42,42 +42,12 @@ export const siteConfig = {
  * stable — `key` is what we store on Job.sector.
  */
 export const reedSectors = [
-  {
-    key: "Finance",
-    label: "Finance",
-    keywords: "finance OR banking OR fintech",
-    graduate: true,
-  },
-  {
-    key: "Accounting",
-    label: "Accounting",
-    keywords: "accounting OR accountant OR audit",
-    graduate: true,
-  },
-  {
-    key: "Consulting",
-    label: "Consulting",
-    keywords: "consulting OR consultant OR strategy",
-    graduate: true,
-  },
-  {
-    key: "Engineering",
-    label: "Engineering",
-    keywords: "engineering OR engineer",
-    graduate: true,
-  },
-  {
-    key: "Law",
-    label: "Law",
-    keywords: "solicitor OR paralegal OR \"vacation scheme\"",
-    graduate: true,
-  },
-  {
-    key: "Marketing",
-    label: "Marketing",
-    keywords: "marketing OR \"brand manager\"",
-    graduate: true,
-  },
+  { key: "Finance",     label: "Finance",     keywords: "finance" },
+  { key: "Accounting",  label: "Accounting",  keywords: "accounting" },
+  { key: "Consulting",  label: "Consulting",  keywords: "consulting" },
+  { key: "Engineering", label: "Engineering", keywords: "engineering" },
+  { key: "Law",         label: "Law",         keywords: "law" },
+  { key: "Marketing",   label: "Marketing",   keywords: "marketing" },
 ] as const;
 
 export type SectorKey = (typeof reedSectors)[number]["key"] | "Other";
@@ -90,8 +60,7 @@ export type SectorKey = (typeof reedSectors)[number]["key"] | "Other";
 export const chineseLanguageConfig = {
   key: "chinese" as const,
   label: "Chinese-speaking",
-  keywords: "chinese OR mandarin OR cantonese",
-  graduate: false,
+  keywords: "chinese",
 };
 
 /**

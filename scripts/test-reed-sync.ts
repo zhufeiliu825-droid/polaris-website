@@ -31,13 +31,12 @@ async function main() {
 
   for (const sector of reedSectors) {
     const t0 = Date.now();
-    console.log(`→ ${sector.key} (kw="${sector.keywords}", graduate=${sector.graduate})`);
+    console.log(`→ ${sector.key} (kw="${sector.keywords}")`);
 
     const results = await reedSearchAll(
       {
         keywords: sector.keywords,
-        locationName: "london",
-        graduate: sector.graduate,
+        permanent: true,
         fullTime: true,
       },
       TARGET_PER_SECTOR

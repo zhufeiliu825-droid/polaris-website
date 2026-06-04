@@ -80,9 +80,9 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
       const results = await reedSearchAll(
         {
           keywords: sector.keywords,
-          // No locationName — search UK-wide. We normalise each result's
-          // postcode → city name before saving (see normalizeLocation).
-          graduate: sector.graduate,
+          // UK-wide (no locationName). Permanent + full-time only —
+          // no graduate flag, no part-time, no contract/temp.
+          permanent: true,
           fullTime: true,
         },
         TARGET_PER_SECTOR
@@ -117,7 +117,8 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
     const chineseResults = await reedSearchAll(
       {
         keywords: chineseLanguageConfig.keywords,
-        graduate: chineseLanguageConfig.graduate,
+        permanent: true,
+        fullTime: true,
       },
       CHINESE_TARGET
     );
