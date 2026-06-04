@@ -173,18 +173,3 @@ export const nationalities = [
   "Prefer not to say",
 ];
 
-/**
- * Current location — UK major cities at the top (most graduates),
- * then a handful of overseas hubs common to our applicant pool.
- * "Other" lets people opt out without us having to enumerate every city.
- */
-export const cities = [
-  // UK
-  "London", "Manchester", "Birmingham", "Bristol", "Edinburgh", "Leeds",
-  "Liverpool", "Glasgow", "Cardiff", "Belfast", "Cambridge", "Oxford",
-  "Brighton", "Nottingham", "Sheffield", "Newcastle", "Coventry",
-  "Other UK city",
-  // Overseas hubs
-  "Beijing", "Shanghai", "Hong Kong", "Singapore", "Dubai", "New York",
-  "Other",
-];

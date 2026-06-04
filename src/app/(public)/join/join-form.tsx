@@ -20,7 +20,6 @@ import {
   programmes,
   referralSources,
   nationalities,
-  cities,
   languages,
   careerStages,
   startTimings,
@@ -301,11 +300,11 @@ export function JoinForm() {
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Select
+            <Field
               label="Current city"
               value={state.city}
-              options={cities}
               onChange={(v) => update("city", v)}
+              placeholder="e.g. London"
             />
             <Select
               label="Where are you from?"
