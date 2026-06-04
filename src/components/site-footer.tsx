@@ -41,10 +41,7 @@ const footerNav = [
   },
   {
     title: "Get in touch",
-    links: [
-      { href: "/join", label: "Join Polaris" },
-      { href: "/contact", label: "Contact us" },
-    ],
+    links: [{ href: "/join#form", label: "Join Polaris" }],
   },
 ];
 
@@ -142,7 +139,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between text-xs text-navy-300">
+        <div className="mt-10 text-xs text-navy-300">
           <p>
             ©{" "}
             <Link
@@ -155,17 +152,6 @@ export function SiteFooter() {
             </Link>{" "}
             Polaris Consulting Ltd. All rights reserved.
           </p>
-          <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-white">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-white">
-              Terms
-            </Link>
-            <Link href="/cookies" className="hover:text-white">
-              Cookies
-            </Link>
-          </div>
         </div>
       </Container>
     </footer>
