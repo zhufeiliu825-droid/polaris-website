@@ -8,39 +8,34 @@ import type { Prisma } from "@prisma/client";
 export const metadata = { title: "Events" };
 
 /**
- * The five chip values the public Events page exposes. "All" is the default
- * (no URL param) and shows everything published.
+ * Two independent filter axes:
+ *   format = online | in-person   → narrows by event format
+ *   when   = ongoing | past       → narrows by time
  *
- *  - all        → no time/format filter
- *  - online     → format = ONLINE
- *  - in-person  → format = IN_PERSON
- *  - ongoing    → endsAt >= now (upcoming + currently running)
- *  - past       → endsAt < now
+ * Each is single-select; either or both can be active. No URL param =
+ * "All" in that axis.
  */
-const FILTERS = [
-  { key: "all", label: "All" },
+const FORMAT_OPTIONS = [
+  { key: "all", label: "All formats" },
   { key: "online", label: "Online" },
   { key: "in-person", label: "In person" },
+] as const;
+const WHEN_OPTIONS = [
+  { key: "all", label: "All time" },
   { key: "ongoing", label: "Ongoing" },
   { key: "past", label: "Past" },
 ] as const;
 
-type FilterKey = (typeof FILTERS)[number]["key"];
+type FormatKey = (typeof FORMAT_OPTIONS)[number]["key"];
+type WhenKey = (typeof WHEN_OPTIONS)[number]["key"];
 
-function whereForFilter(f: FilterKey, now: Date): Prisma.EventWhereInput {
-  const base: Prisma.EventWhereInput = { published: true };
-  switch (f) {
-    case "online":
-      return { ...base, format: "ONLINE" };
-    case "in-person":
-      return { ...base, format: "IN_PERSON" };
-    case "ongoing":
-      return { ...base, endsAt: { gte: now } };
-    case "past":
-      return { ...base, endsAt: { lt: now } };
-    default:
-      return base;
-  }
+function buildWhere(format: FormatKey, when: WhenKey, now: Date): Prisma.EventWhereInput {
+  const where: Prisma.EventWhereInput = { published: true };
+  if (format === "online") where.format = "ONLINE";
+  if (format === "in-person") where.format = "IN_PERSON";
+  if (when === "ongoing") where.endsAt = { gte: now };
+  if (when === "past") where.endsAt = { lt: now };
+  return where;
 }
 
 function formatEventDateTime(starts: Date, ends: Date): { date: string; time: string } {
@@ -62,26 +57,43 @@ function formatEventDateTime(starts: Date, ends: Date): { date: string; time: st
   return { date, time };
 }
 
-type Search = Promise<{ filter?: string }>;
+type Search = Promise<{ format?: string; when?: string }>;
 
 export default async function EventsPage({ searchParams }: { searchParams: Search }) {
   const sp = await searchParams;
-  const validKeys = new Set<string>(FILTERS.map((f) => f.key));
-  const activeKey: FilterKey =
-    sp.filter && validKeys.has(sp.filter) ? (sp.filter as FilterKey) : "all";
+  const validFormats = new Set<string>(FORMAT_OPTIONS.map((o) => o.key));
+  const validWhens = new Set<string>(WHEN_OPTIONS.map((o) => o.key));
+  const activeFormat: FormatKey =
+    sp.format && validFormats.has(sp.format) ? (sp.format as FormatKey) : "all";
+  const activeWhen: WhenKey =
+    sp.when && validWhens.has(sp.when) ? (sp.when as WhenKey) : "all";
 
   const now = new Date();
-  const where = whereForFilter(activeKey, now);
+  const where = buildWhere(activeFormat, activeWhen, now);
 
-  // Past events are most recent first; everything else is soonest-first.
+  // Past events sorted newest first; everything else soonest first.
   const orderBy: Prisma.EventOrderByWithRelationInput =
-    activeKey === "past" ? { startsAt: "desc" } : { startsAt: "asc" };
+    activeWhen === "past" ? { startsAt: "desc" } : { startsAt: "asc" };
 
   const events = await prisma.event.findMany({
     where,
     orderBy,
     include: { _count: { select: { registrations: true } } },
   });
+
+  /**
+   * Builds the href for a chip in a given axis. Keeps the other axis's
+   * active value intact. The "all" key clears that axis's URL param.
+   */
+  const hrefFor = (axis: "format" | "when", key: string) => {
+    const next = new URLSearchParams();
+    const f = axis === "format" ? key : activeFormat;
+    const w = axis === "when" ? key : activeWhen;
+    if (f !== "all") next.set("format", f);
+    if (w !== "all") next.set("when", w);
+    const s = next.toString();
+    return s ? `/events?${s}` : "/events";
+  };
 
   return (
     <>
@@ -93,36 +105,28 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
 
       <section className="py-16 bg-paper">
         <Container>
-          {/* FILTER CHIPS */}
-          <div className="flex gap-3 flex-wrap mb-10">
-            {FILTERS.map((f) => {
-              const isActive = f.key === activeKey;
-              const href = f.key === "all" ? "/events" : `/events?filter=${f.key}`;
-              return (
-                <Link
-                  key={f.key}
-                  href={href}
-                  scroll={false}
-                  className={
-                    isActive
-                      ? "h-10 px-5 inline-flex items-center rounded-full bg-sand-100 text-navy-950 text-sm font-medium"
-                      : "h-10 px-5 inline-flex items-center rounded-full bg-white border border-navy-200 text-sm font-medium text-navy-700 hover:bg-navy-50"
-                  }
-                >
-                  {f.label}
-                </Link>
-              );
-            })}
+          {/* FILTER CHIPS — two independent axes */}
+          <div className="space-y-3 mb-10">
+            <ChipRow
+              options={FORMAT_OPTIONS}
+              activeKey={activeFormat}
+              hrefFor={(k) => hrefFor("format", k)}
+            />
+            <ChipRow
+              options={WHEN_OPTIONS}
+              activeKey={activeWhen}
+              hrefFor={(k) => hrefFor("when", k)}
+            />
           </div>
 
           {events.length === 0 ? (
             <div className="bg-white border border-navy-100 rounded-2xl p-12 text-center">
               <p className="text-navy-600">
-                {activeKey === "past"
+                {activeWhen === "past"
                   ? "No past events to show."
-                  : activeKey === "ongoing"
+                  : activeWhen === "ongoing"
                     ? "Nothing on the calendar right now — check back soon."
-                    : "No events match this filter."}
+                    : "No events match these filters."}
               </p>
             </div>
           ) : (
@@ -214,5 +218,37 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
         </Container>
       </section>
     </>
+  );
+}
+
+function ChipRow({
+  options,
+  activeKey,
+  hrefFor,
+}: {
+  options: readonly { key: string; label: string }[];
+  activeKey: string;
+  hrefFor: (key: string) => string;
+}) {
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {options.map((o) => {
+        const isActive = o.key === activeKey;
+        return (
+          <Link
+            key={o.key}
+            href={hrefFor(o.key)}
+            scroll={false}
+            className={
+              isActive
+                ? "h-10 px-5 inline-flex items-center rounded-full bg-sand-100 text-navy-950 text-sm font-medium"
+                : "h-10 px-5 inline-flex items-center rounded-full bg-white border border-navy-200 text-sm font-medium text-navy-700 hover:bg-navy-50"
+            }
+          >
+            {o.label}
+          </Link>
+        );
+      })}
+    </div>
   );
 }
