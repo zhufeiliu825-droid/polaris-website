@@ -1,15 +1,18 @@
 /**
- * Auth gate for the admin portal.
+ * Auth gate for the admin portal (formerly middleware.ts).
+ *
+ * Next.js 16 renamed `middleware.ts` → `proxy.ts` and `export middleware`
+ * → `export proxy`. Functionally identical: the matcher in `config` decides
+ * which requests this runs on.
  *
  * Any request to /admin/* (except /admin/login) requires a valid signed
- * session cookie. The verification is HMAC-only — no DB call — so it's safe
- * to run on every request.
+ * session cookie. Verification is HMAC-only — no DB call — so it's cheap.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/admin/login")) {
