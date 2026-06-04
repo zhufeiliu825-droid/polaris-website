@@ -51,3 +51,4 @@ Required env vars (see `.env.local`):
 | `scripts/db-test.ts` | Print row counts per table (smoke test) |
 | `scripts/auth-test.ts` | Generate a valid session token for a given admin |
 | `scripts/email-test.ts` | Send a test email via Resend |
+
