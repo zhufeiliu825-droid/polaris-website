@@ -64,8 +64,8 @@ export default function Home() {
               consulting, technology, law and beyond.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <ButtonLink href="/join" variant="secondary" size="lg">
-                Become a member <ArrowRight className="h-4 w-4" />
+              <ButtonLink href="/contact" variant="secondary" size="lg">
+                Get in touch <ArrowRight className="h-4 w-4" />
               </ButtonLink>
               <ButtonLink
                 href="/opportunities"
@@ -224,8 +224,8 @@ export default function Home() {
               </p>
             </div>
             <div className="lg:justify-self-end flex flex-col sm:flex-row gap-4">
-              <ButtonLink href="/join" variant="secondary" size="lg">
-                Become a member <ArrowRight className="h-4 w-4" />
+              <ButtonLink href="/contact" variant="secondary" size="lg">
+                Get in touch <ArrowRight className="h-4 w-4" />
               </ButtonLink>
               <ButtonLink
                 href="/contact"
