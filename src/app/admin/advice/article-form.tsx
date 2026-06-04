@@ -69,6 +69,10 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
   );
   const computedMinutes = Math.max(1, Math.round(words / 200));
 
+  // Title + slug are the minimum for a publishable article. While either is
+  // empty, the Publish toggle is forced off + disabled.
+  const canPublish = !!(state.title.trim() && state.slug.trim());
+
   return (
     <form action={action} className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
       {isEdit && initial?.id && <input type="hidden" name="id" value={initial.id} />}
@@ -223,20 +227,34 @@ export function ArticleForm({ initial, isEdit, action, deleteAction }: Props) {
           <h3 className="text-xs uppercase tracking-widest text-navy-900 font-semibold mb-4">
             Publish
           </h3>
-          <label className="flex items-center gap-3 mb-3">
+          {/* publish needs at least a title + slug — disable the toggle
+              when those are missing so admin can't ship an empty article. */}
+          <label className="flex items-center gap-3 mb-1">
             <input
               type="checkbox"
               name="published"
-              checked={state.published}
+              checked={state.published && canPublish}
+              disabled={!canPublish}
               onChange={(e) => set("published", e.target.checked)}
-              className="h-4 w-4 rounded border-navy-300 text-navy-900"
+              className="h-4 w-4 rounded border-navy-300 text-navy-900 disabled:opacity-40"
             />
-            <span className="text-sm text-navy-900">
-              {state.published
+            <span
+              className={
+                "text-sm " + (canPublish ? "text-navy-900" : "text-navy-400")
+              }
+            >
+              {state.published && canPublish
                 ? "Published — visible on /advice"
                 : "Draft — admin only"}
             </span>
           </label>
+          {!canPublish ? (
+            <p className="text-xs text-navy-400 mb-3 ml-7">
+              Fill in the title and URL slug to enable publishing.
+            </p>
+          ) : (
+            <div className="mb-3" />
+          )}
 
           <label className="flex items-center gap-3 mb-5">
             <input

@@ -42,6 +42,10 @@ export async function updateEvent(formData: FormData) {
   revalidatePath("/admin/events");
   revalidatePath("/events");
   revalidatePath(`/events/${slug}`);
+  // Hard-reload the edit page so the green "Changes saved" banner shows
+  // and React's uncontrolled inputs pick up the saved values (same trick
+  // we use for /admin/applications).
+  redirect(`/admin/events/${id}?saved=1`);
 }
 
 export async function deleteEvent(formData: FormData) {

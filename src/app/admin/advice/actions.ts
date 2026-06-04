@@ -58,6 +58,7 @@ export async function updateArticle(formData: FormData) {
   revalidatePath("/admin/advice");
   revalidatePath("/advice");
   revalidatePath(`/advice/${slug}`);
+  redirect(`/admin/advice/${id}?saved=1`);
 }
 
 export async function deleteArticle(formData: FormData) {

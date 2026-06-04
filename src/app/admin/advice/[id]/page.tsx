@@ -8,9 +8,17 @@ import { updateArticle, deleteArticle } from "../actions";
 export const metadata = { title: "Admin · Edit article" };
 
 type Params = Promise<{ id: string }>;
+type Search = Promise<{ saved?: string }>;
 
-export default async function EditArticlePage({ params }: { params: Params }) {
+export default async function EditArticlePage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: Search;
+}) {
   const { id } = await params;
+  const { saved } = await searchParams;
   const article = await prisma.article.findUnique({ where: { id } });
   if (!article) notFound();
 
@@ -22,6 +30,11 @@ export default async function EditArticlePage({ params }: { params: Params }) {
       >
         <ArrowLeft className="h-4 w-4" /> All articles
       </Link>
+      {saved && (
+        <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+          Changes saved.
+        </div>
+      )}
       <h1 className="text-3xl font-light tracking-tight text-navy-950 mb-2">
         {article.title}
       </h1>
