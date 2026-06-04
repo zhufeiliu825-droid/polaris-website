@@ -308,7 +308,7 @@ export function JoinForm() {
               onChange={(v) => update("city", v)}
             />
             <Select
-              label="Nationality"
+              label="Where are you from?"
               value={state.nationality}
               options={nationalities}
               onChange={(v) => update("nationality", v)}
@@ -664,11 +664,20 @@ function Select({
         <option value="" disabled>
           Please select…
         </option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
+        {/* "—" entries in the options list become visual separators
+            (disabled, no value) so we can group e.g. UK at the top
+            vs the rest of the world alphabetically below. */}
+        {options.map((o, i) =>
+          o === "—" ? (
+            <option key={`sep-${i}`} value="" disabled>
+              ────────
+            </option>
+          ) : (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          )
+        )}
       </select>
       {hint && <p className="mt-1.5 text-xs text-navy-500">{hint}</p>}
     </div>
