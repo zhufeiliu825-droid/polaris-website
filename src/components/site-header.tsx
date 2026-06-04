@@ -33,7 +33,7 @@ export function SiteHeader() {
 
         <div className="hidden lg:flex items-center gap-3">
           <ButtonLink href="/join" variant="primary" size="sm">
-            Join us
+            Contact us
           </ButtonLink>
         </div>
 
@@ -73,7 +73,7 @@ export function SiteHeader() {
               className="flex-1"
               onClick={() => setOpen(false)}
             >
-              Join us
+              Contact us
             </ButtonLink>
           </div>
         </Container>

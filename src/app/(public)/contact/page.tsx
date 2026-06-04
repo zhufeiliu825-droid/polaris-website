@@ -12,7 +12,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Contact"
         title="Let's talk about where you want to go."
-        subtitle="Drop us a line, give us a ring, or come visit us at our London office. The fastest way to start working with us is to join Polaris."
+        subtitle="Drop us a line, give us a ring, or come visit us at our London office. The fastest way to start working with us is via our short intake form."
       />
 
       <section className="py-20 md:py-28 bg-paper">
@@ -82,7 +82,7 @@ export default function ContactPage() {
 
             {/* CTA — right column (replaces the old contact form) */}
             <Link
-              href="/join"
+              href="/join#form"
               className="group lg:col-span-7 relative overflow-hidden bg-navy-950 text-white rounded-2xl p-10 md:p-14 flex flex-col justify-between hover:bg-navy-900 transition-colors min-h-[480px]"
             >
               <div
@@ -95,7 +95,7 @@ export default function ContactPage() {
                   Ready to start?
                 </p>
                 <h2 className="mt-4 text-3xl md:text-4xl font-light tracking-tight leading-tight">
-                  Join Polaris in five minutes.
+                  Get in touch in five minutes.
                 </h2>
                 <p className="mt-5 text-lg text-navy-100 leading-relaxed max-w-md">
                   Tell us about your goals, your background, and where you want
@@ -118,7 +118,7 @@ export default function ContactPage() {
               </div>
 
               <div className="relative mt-10 inline-flex items-center gap-3 self-start h-12 px-7 rounded-full bg-white text-navy-950 font-medium text-base group-hover:gap-4 transition-all">
-                Start your application
+                Open the contact form
                 <ArrowRight className="h-5 w-5" />
               </div>
             </Link>

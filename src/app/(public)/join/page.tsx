@@ -3,7 +3,7 @@ import { PageHero } from "@/components/page-hero";
 import { JoinForm } from "./join-form";
 import { CheckCircle2 } from "lucide-react";
 
-export const metadata = { title: "Join us" };
+export const metadata = { title: "Contact us" };
 
 const benefits = [
   "1-to-1 mentor matched to your target sector",
@@ -16,12 +16,12 @@ export default function JoinPage() {
   return (
     <>
       <PageHero
-        eyebrow="Join Polaris"
+        eyebrow="Contact us"
         title="Tell us about you — in five quick steps."
         subtitle="The more we know, the better we can match you with the right mentor and opportunities. Most people finish in under five minutes."
       />
 
-      {/* id="form" — landing target for "Get in touch" / Join CTA buttons
+      {/* id="form" — landing target for "Get in touch" / Contact CTA buttons
           elsewhere on the site, so /join#form scrolls past the intro and
           drops the user straight into the form. */}
       <section id="form" className="py-16 md:py-20 bg-paper scroll-mt-4">

@@ -219,8 +219,8 @@ export default function Home() {
                 Ready to navigate<br />your success?
               </h2>
               <p className="mt-6 text-lg text-navy-100 max-w-lg">
-                Join Polaris in five minutes. Tell us about your goals — a
-                mentor will be in touch within five working days.
+                Tell us about your goals in under five minutes — a mentor
+                will be in touch within five working days.
               </p>
             </div>
             <div className="lg:justify-self-end">

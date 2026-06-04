@@ -78,8 +78,8 @@ export default async function AdminLoginPage({ searchParams }: Props) {
 
         <p className="mt-8 text-xs text-navy-500 text-center">
           Not a Polaris team member? You probably want our{" "}
-          <Link href="/join" className="underline">
-            membership signup
+          <Link href="/join#form" className="underline">
+            contact form
           </Link>{" "}
           instead.
         </p>

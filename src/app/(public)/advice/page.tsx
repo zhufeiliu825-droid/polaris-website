@@ -87,7 +87,7 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
               <p className="text-navy-600">
                 Nothing here yet — new articles drop most weeks.{" "}
                 <Link href="/join" className="underline">
-                  Join Polaris
+                  Contact us
                 </Link>{" "}
                 and we&apos;ll email when the next one is out.
               </p>

@@ -41,7 +41,7 @@ const footerNav = [
   },
   {
     title: "Get in touch",
-    links: [{ href: "/join#form", label: "Join Polaris" }],
+    links: [{ href: "/join#form", label: "Contact us" }],
   },
 ];
 
