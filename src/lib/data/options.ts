@@ -117,12 +117,22 @@ export const referralSources = [
 
 /**
  * ISO 3166-1 member states + a few commonly-listed entities (Taiwan,
- * Hong Kong, Macao). Sorted alphabetically; "Prefer not to say" pinned
- * at the end as a privacy-friendly opt-out. UK pinned at the top so the
- * most likely choice for our user base is one click away.
+ * Hong Kong, Macao).
+ *
+ * Layout: a small "pinned" block of the most likely choices for our
+ * applicant pool (UK + Greater China + SE-Asia hubs) sits at the top.
+ * A ──── separator divides that from the alphabetical rest. The same
+ * entries are omitted from the alphabetical section so each country
+ * appears exactly once. "Prefer not to say" sits at the bottom.
  */
 export const nationalities = [
   "United Kingdom",
+  "China",
+  "Hong Kong, China",
+  "Macao, China",
+  "Taiwan, China",
+  "Singapore",
+  "Malaysia",
   "—",
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
   "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
@@ -130,7 +140,7 @@ export const nationalities = [
   "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina",
   "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
   "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic",
-  "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Brazzaville)",
+  "Chad", "Chile", "Colombia", "Comoros", "Congo (Brazzaville)",
   "Congo (Kinshasa)", "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba",
   "Cyprus", "Czechia",
   "Denmark", "Djibouti", "Dominica", "Dominican Republic",
@@ -139,14 +149,14 @@ export const nationalities = [
   "Fiji", "Finland", "France",
   "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
   "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
-  "Haiti", "Honduras", "Hong Kong, China", "Hungary",
+  "Haiti", "Honduras", "Hungary",
   "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
   "Italy",
   "Jamaica", "Japan", "Jordan",
   "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan",
   "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya",
   "Liechtenstein", "Lithuania", "Luxembourg",
-  "Macao, China", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+  "Madagascar", "Malawi", "Maldives", "Mali", "Malta",
   "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia",
   "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique",
   "Myanmar",
@@ -159,10 +169,10 @@ export const nationalities = [
   "Romania", "Russia", "Rwanda",
   "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
   "Samoa", "San Marino", "São Tomé and Príncipe", "Saudi Arabia", "Senegal",
-  "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
+  "Serbia", "Seychelles", "Sierra Leone", "Slovakia", "Slovenia",
   "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan",
   "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
-  "Taiwan, China", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
+  "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
   "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
   "Uganda", "Ukraine", "United Arab Emirates", "United States", "Uruguay",
   "Uzbekistan",
