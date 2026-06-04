@@ -40,7 +40,10 @@ export default async function EditEventPage({ params }: { params: Params }) {
           body: event.body,
           startsAt: event.startsAt.toISOString(),
           endsAt: event.endsAt.toISOString(),
-          format: event.format,
+          // Older events may have been saved as HYBRID. The dropdown
+          // dropped that option, so we map any legacy HYBRID → IN_PERSON
+          // until staff re-saves with their actual intent.
+          format: event.format === "ONLINE" ? "ONLINE" : "IN_PERSON",
           location: event.location,
           sector: event.sector ?? null,
           capacity: event.capacity,
