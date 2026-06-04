@@ -41,7 +41,15 @@ export type SyncResult = {
 
 const CHINESE_REGEX = /\b(chinese|mandarin|cantonese)\b/i;
 
-const TARGET_PER_SECTOR = 100;
+const TARGET_PER_SECTOR = 200;
+
+/**
+ * Inactive jobs (last seen more than this many days ago) get hard-deleted
+ * at the end of every sync. Keeps the DB from growing forever while still
+ * giving stale jobs a grace window to come back as active before we lose
+ * them permanently.
+ */
+const INACTIVE_CLEANUP_DAYS = 7;
 
 type StagedJob = {
   id: string;
@@ -213,6 +221,21 @@ export async function runReedSync(options: { log?: (msg: string) => void } = {})
       },
       data: { isActive: false },
     });
+
+    // Hard-delete jobs that have been inactive long enough. Reed jobs that
+    // come back into the top-200 within the grace window will re-upsert
+    // (refreshing isActive=true); anything beyond INACTIVE_CLEANUP_DAYS is
+    // safe to drop.
+    const cutoff = new Date(Date.now() - INACTIVE_CLEANUP_DAYS * 86_400_000);
+    const purged = await prisma.job.deleteMany({
+      where: {
+        isActive: false,
+        lastSeenAt: { lt: cutoff },
+      },
+    });
+    if (purged.count > 0) {
+      log(`  ${"Cleanup".padEnd(13)} ${String(purged.count).padStart(3)} purged · stale > ${INACTIVE_CLEANUP_DAYS}d`);
+    }
 
     // ─── Compute metrics ────────────────────────────────────────
     const perSectorCounts: Record<string, number> = {};
