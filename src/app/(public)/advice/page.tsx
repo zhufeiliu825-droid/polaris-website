@@ -55,6 +55,7 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
                 <Link
                   key={c}
                   href={href}
+                  scroll={false}
                   className={
                     isActive
                       ? "h-9 px-4 inline-flex items-center rounded-full bg-navy-950 text-white text-sm font-medium"

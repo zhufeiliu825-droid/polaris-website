@@ -131,8 +131,9 @@ export default async function OpportunitiesPage({
       <section className="bg-paper py-12">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10">
-            {/* FILTERS */}
-            <aside className="space-y-7 lg:sticky lg:top-24 self-start">
+            {/* FILTERS — sticky + independently scrollable when the list of
+                filter rows would otherwise overflow the viewport. */}
+            <aside className="space-y-7 lg:sticky lg:top-6 self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-2">
               <form action="/opportunities" method="get">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
@@ -208,6 +209,7 @@ export default async function OpportunitiesPage({
               {(sector || city || q) && (
                 <Link
                   href="/opportunities"
+                  scroll={false}
                   className="text-xs text-navy-600 hover:text-navy-900 underline underline-offset-4"
                 >
                   Clear all filters
@@ -395,8 +397,11 @@ function SidebarRow({
 }) {
   return (
     <li>
+      {/* scroll={false}: filter clicks preserve the user's scroll position
+          instead of jumping back up to the hero on every change. */}
       <Link
         href={href}
+        scroll={false}
         className={
           "flex items-center justify-between gap-2 py-1.5 text-sm rounded-md px-2 -mx-2 " +
           (active
