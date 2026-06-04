@@ -1,0 +1,249 @@
+// Polaris Consulting — database schema
+// Provider: Supabase Postgres (free tier)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────────────────────────────────────────
+// Member applications (Join Us form submissions)
+// ───────────────────────────────────────────────────────────────
+model Application {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Personal
+  firstName    String
+  lastName     String
+  email        String
+  phone        String
+  nationality  String?
+  city         String?
+
+  // Education
+  degreeLevel    String?
+  university     String?
+  course         String?
+  yearOfStudy    String?
+  graduationYear Int?
+  academicResult String?
+
+  // Goals
+  targetSectors String[] // multi-select
+  programme     String?
+  startTiming   String?
+  notes         String?  @db.Text
+
+  // Final
+  source          String?
+  cvUrl           String? // Supabase Storage URL
+  privacyAccepted Boolean @default(false)
+  marketingOptIn  Boolean @default(false)
+
+  // Workflow
+  status      ApplicationStatus @default(NEW)
+  assignedTo  String? // admin email of sales person who owns it
+  internalNotes String? @db.Text
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ApplicationStatus {
+  NEW
+  CONTACTED
+  IN_PROGRESS
+  WON
+  LOST
+  ARCHIVED
+}
+
+// ───────────────────────────────────────────────────────────────
+// Reed-sourced jobs (cached for browsing + filtering)
+// ───────────────────────────────────────────────────────────────
+model Job {
+  id String @id // Reed jobId as string
+
+  // Core fields from search
+  jobTitle          String
+  employerId        Int?
+  employerName      String?
+  employerProfileId Int?
+  description       String  @db.Text
+  locationName      String?
+  minSalary         Int?
+  maxSalary         Int?
+
+  // Polaris classification
+  sector     String  // one of our 6: Finance/Accounting/Consulting/Engineering/Law/Marketing
+  isGraduate Boolean @default(true)
+  isFeatured Boolean @default(false) // pinned by admin
+
+  // Fields from details endpoint (lazy fetched)
+  yearlyMinSalary  Int?
+  yearlyMaxSalary  Int?
+  currency         String?    // "GBP"
+  salaryType       String?    // "Annual"
+  contractType     String?    // "Permanent" / "Contract" / "Temporary"
+  jobType          String?    // "FullTime" / "PartTime"
+  expirationDate   DateTime?
+  externalUrl      String?    // employer's own apply URL
+  jobUrl           String?    // reed.co.uk page URL
+  detailsFetchedAt DateTime?
+
+  // Sync bookkeeping
+  raw            Json? // full Reed payload, for forward-compat
+  isActive       Boolean  @default(true)
+  firstSeenAt    DateTime @default(now())
+  lastSeenAt     DateTime @default(now()) // updated on each sync that returns this job
+  missingCycles  Int      @default(0)     // incremented when sync doesn't return it; 3 → isActive=false
+
+  @@index([sector])
+  @@index([locationName])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([expirationDate])
+}
+
+// ───────────────────────────────────────────────────────────────
+// Tracks every Reed sync run (for monitoring + debugging)
+// ───────────────────────────────────────────────────────────────
+model JobSyncRun {
+  id        String    @id @default(cuid())
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  ok        Boolean   @default(false)
+
+  sectorsRun  String[] // ["Finance", "Accounting", ...]
+  jobsFetched Int      @default(0)
+  jobsAdded   Int      @default(0)
+  jobsUpdated Int      @default(0)
+  jobsExpired Int      @default(0)
+  apiCalls    Int      @default(0)
+  errorLog    String?  @db.Text
+}
+
+// ───────────────────────────────────────────────────────────────
+// CMS — Events (admin creates these)
+// ───────────────────────────────────────────────────────────────
+model Event {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String
+  body      String   @db.Text // Markdown
+  coverUrl  String?
+
+  startsAt  DateTime
+  endsAt    DateTime
+  format    EventFormat
+  location  String      // physical addr OR "Zoom" etc
+  sector    String?     // one of the 6, optional
+
+  capacity  Int?
+  registrationsCount Int @default(0)
+  registrationUrl    String? // optional external URL (e.g., Eventbrite)
+
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdBy   String?   // admin email
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  registrations EventRegistration[]
+
+  @@index([startsAt])
+  @@index([published])
+}
+
+enum EventFormat {
+  ONLINE
+  IN_PERSON
+  HYBRID
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  notes     String?  @db.Text
+  attended  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, email])
+  @@index([email])
+}
+
+// ───────────────────────────────────────────────────────────────
+// CMS — Advice articles (admin creates these)
+// ───────────────────────────────────────────────────────────────
+model Article {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  title     String
+  excerpt   String
+  body      String  @db.Text // Markdown
+  coverUrl  String?
+  category  String  // Applications / Interviews / Assessment / Industry insights / Working life
+  tags      String[]
+  readMinutes Int   @default(5)
+
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+
+  authorName  String?   // free-text byline (we're not building full author profiles yet)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, publishedAt])
+  @@index([category])
+}
+
+// ───────────────────────────────────────────────────────────────
+// Staff users (admin panel)
+// ───────────────────────────────────────────────────────────────
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String   // bcrypt
+  role         AdminRole @default(SALES)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  lastLoginAt  DateTime?
+}
+
+enum AdminRole {
+  OWNER
+  EDITOR
+  SALES
+}
+
+// ───────────────────────────────────────────────────────────────
+// Generic contact-form submissions
+// ───────────────────────────────────────────────────────────────
+model ContactMessage {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  topic     String?
+  message   String   @db.Text
+  handled   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([handled])
+  @@index([createdAt])
+}
