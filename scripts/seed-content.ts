@@ -548,6 +548,194 @@ Ask yourself two questions: do you lean **analytical or creative**, and do you p
 
 You don't have to decide forever — most marketers move across these over a career. But picking a first focus lets you build a sharper portfolio and a more convincing application.`,
   },
+
+  // ───────────────────────── ASSESSMENT ─────────────────────────
+  {
+    slug: "assessment-centres-what-to-expect",
+    title: "Assessment centres: what to expect",
+    excerpt:
+      "Group exercises, case studies, presentations and interviews in one day — how assessment centres work and how to prepare.",
+    category: "Assessment",
+    tags: ["Assessment", "Assessment Centre", "Applications"],
+    readMinutes: 1,
+    author: "Polaris Careers Team",
+    publishedAt: "2026-02-04T09:00:00Z",
+    body: `The assessment centre is the final hurdle for most graduate schemes — a half or full day where employers watch how you actually behave, not just how you answer questions. Knowing the format removes most of the fear.
+
+## The usual components
+
+Assessment centres mix several exercises, typically including:
+
+- **Group exercise.** A team is given a problem and watched as you discuss it. They're assessing *how* you contribute, not whether you "win".
+- **Case study or in-tray exercise.** You analyse information and make a recommendation, often under time pressure.
+- **Presentation.** Sometimes prepared in advance, sometimes on the day.
+- **Interview(s).** Competency and sometimes technical.
+- **Social elements.** Lunch or coffee with current employees — informal, but you're still being observed.
+
+## How to stand out in the group exercise
+
+This is where people most often trip up. The key insight: assessors want a **good team member**, not a dominator.
+
+- Contribute clearly and early, but **bring others in** ("Sara, what do you think?").
+- Watch the time and the objective — gently steer the group back if it drifts.
+- Disagree respectfully and build on others' points rather than steam-rolling them.
+
+Talking the most is not the goal. Moving the team toward a good outcome is.
+
+## The day-of mindset
+
+- Be consistently pleasant to **everyone**, including reception and other candidates. It's noticed.
+- Treat each exercise as fresh — a weak group task doesn't sink you if the rest is strong.
+- Ask thoughtful questions throughout; curiosity reads as engagement.
+
+Assessment centres reward people who are prepared, collaborative and calm. None of that requires being the loudest person in the room.`,
+  },
+  {
+    slug: "psychometric-and-situational-judgement-tests",
+    title: "Psychometric & situational judgement tests, explained",
+    excerpt:
+      "Numerical, verbal, logical and SJT tests screen most graduate applicants. What they measure and how to prepare properly.",
+    category: "Assessment",
+    tags: ["Assessment", "Psychometric Tests", "SJT"],
+    readMinutes: 1,
+    author: "Polaris Careers Team",
+    publishedAt: "2026-03-23T09:00:00Z",
+    body: `Most large graduate schemes screen applicants with online tests before a human ever reads your CV. They're designed to be efficient filters — and they're very beatable with the right preparation.
+
+## The main types
+
+- **Numerical reasoning.** Interpreting data in tables and charts under time pressure. Not advanced maths — speed and accuracy with percentages, ratios and trends.
+- **Verbal reasoning.** Reading a passage and judging whether statements are true, false, or cannot be determined. The trap is using outside knowledge instead of *only* the passage.
+- **Logical / inductive reasoning.** Spotting patterns in sequences of shapes. Tests abstract problem-solving.
+- **Situational judgement tests (SJTs).** You're given workplace scenarios and asked to rank or choose responses. These measure whether your instincts match the employer's values.
+
+## How to prepare
+
+- **Practise under timed conditions.** The pressure is the real test. Free and paid practice packs from the major test providers (SHL, Cubiks, Korn Ferry) mirror the real thing closely.
+- **Learn the format, not the answers.** Knowing how a question type works saves precious seconds.
+- **For numerical:** get fast at mental percentages and reading charts. A calculator is usually allowed, but speed still matters.
+- **For verbal:** answer strictly from the passage. "Cannot say" is correct more often than people expect.
+
+## SJTs are different
+
+You can't "revise" an SJT the same way — they probe judgement. The best preparation is to **research the employer's values** and answer in line with them: prioritising the customer, escalating appropriately, collaborating over going solo. Read the question as "what would a good employee here do?"
+
+Treat these tests as a skill to train, not a verdict on your intelligence. A week of focused practice routinely turns a borderline score into a comfortable pass.`,
+  },
+
+  // ───────────────────────── WORKING LIFE ─────────────────────────
+  {
+    slug: "your-first-90-days-in-a-graduate-role",
+    title: "Your first 90 days in a graduate role",
+    excerpt:
+      "The habits that build a strong reputation early — and the rookie mistakes that quietly hold people back.",
+    category: "Working life",
+    tags: ["Working life", "Graduate", "Career"],
+    readMinutes: 1,
+    author: "Polaris Mentor Team",
+    publishedAt: "2026-04-29T09:00:00Z",
+    body: `Your first three months set the tone for years. Nobody expects you to be brilliant immediately — they're watching whether you're reliable, coachable and easy to work with. Get those right and the rest follows.
+
+## Be reliable before you're impressive
+
+The fastest way to build trust is to **do what you said you'd do, when you said you'd do it.** Hit small deadlines. Reply to messages. If something will be late, flag it early. Reliability compounds into being given bigger, more interesting work.
+
+## Ask good questions — the right way
+
+You're supposed to ask questions; that's what your first months are for. But ask them well:
+
+- **Try first, then ask.** "I tried X and got stuck at Y — am I thinking about this right?" beats "how do I do this?"
+- **Batch small questions** rather than interrupting constantly.
+- **Write down the answers** so you don't ask twice.
+
+## Take notes and own your mistakes
+
+Keep a running note of how things work, who owns what, and feedback you receive. When you make a mistake — and you will — **own it quickly, fix it, and learn.** Managers remember how you handled the error far more than the error itself.
+
+## Build relationships deliberately
+
+- Have coffee with people across the team, not just your immediate manager.
+- Understand what your team is actually trying to achieve, and how your work contributes.
+- Say yes to the social side within reason — careers are built on relationships as much as output.
+
+## Manage your own development
+
+Around the 90-day mark, ask your manager for honest feedback: "what should I do more of, and what should I improve?" Acting visibly on the answer is one of the strongest signals you can send. The graduates who progress fastest are the ones who take ownership of their own growth from day one.`,
+  },
+  {
+    slug: "networking-that-doesnt-feel-awkward",
+    title: "Networking that doesn't feel awkward",
+    excerpt:
+      "Forget collecting business cards. Real networking is a handful of genuine relationships — here's how to build them.",
+    category: "Working life",
+    tags: ["Working life", "Networking", "Career"],
+    readMinutes: 1,
+    author: "Polaris Mentor Team",
+    publishedAt: "2026-05-24T09:00:00Z",
+    body: `"Networking" makes most students cringe — it sounds like forced small talk and handing out business cards. Done properly, it's something much simpler: building a small number of genuine professional relationships over time.
+
+## Reframe what it's for
+
+You're not trying to "use" people. You're trying to **learn from them and stay in touch.** The best networking is curiosity-led: you're genuinely interested in what someone does, and the relationship grows from there. Opportunities follow relationships, not the other way round.
+
+## The coffee-chat formula
+
+The most useful networking tool is a 20-minute conversation:
+
+- **Reach out specifically.** "I saw you moved from consulting into a strategy role at X — I'd love to hear how you made that switch." Specific beats generic every time.
+- **Do your homework.** Read their background so you can ask good questions.
+- **Ask, don't pitch.** People love talking about their own path. Listen more than you talk.
+- **Make it easy to say yes.** Offer to work around their schedule; keep it short.
+
+## Follow up like a human
+
+- Send a short thank-you the same day.
+- **Stay in touch lightly** — share an article they'd find interesting, or update them when their advice helped. One thoughtful message a few months later keeps a relationship warm.
+
+## Use LinkedIn well
+
+- A clear, current profile so people can place you.
+- Engage genuinely with a few people's posts rather than mass-connecting.
+- When you connect, **add a one-line note** — never the blank request.
+
+Networking isn't a numbers game. Five people who'd happily take your call beat five hundred connections who wouldn't recognise your name.`,
+  },
+
+  // ───────────────────────── OTHER ─────────────────────────
+  {
+    slug: "choosing-between-competing-graduate-offers",
+    title: "How to choose between competing offers",
+    excerpt:
+      "Two offers is a good problem — but an emotional one. A clear framework for weighing them beyond starting salary.",
+    category: "Other",
+    tags: ["Other", "Offers", "Career"],
+    readMinutes: 1,
+    author: "Polaris Careers Team",
+    publishedAt: "2026-04-02T09:00:00Z",
+    body: `Holding two graduate offers is a genuinely good problem — but it's an emotional decision, and starting salary tends to dominate the conversation when it shouldn't. A simple framework helps you choose well.
+
+## Look past the headline salary
+
+A few thousand pounds of starting salary is far less important than these, over a career:
+
+- **Training and qualification.** Does one fund a professional qualification (ACA, CFA, SQE, chartership)? That's worth more than a salary bump.
+- **The first two years of work.** Which gives you more responsibility, better mentoring, and skills that transfer?
+- **Exit options.** Where do people go *after* this role? A role that opens many doors beats a slightly better-paid dead end.
+
+## Weigh the things that affect daily life
+
+- **The people and culture.** You felt this during the process — trust it. Where did you click with the team?
+- **Location and lifestyle.** Commute, cost of living, and how the hours actually look day to day.
+- **The work itself.** Which problems would you genuinely enjoy spending your time on?
+
+## A practical method
+
+List the factors that matter to *you*, weight them (not everything is equal), and score each offer honestly. The numbers rarely make the decision for you — but the exercise surfaces what you actually care about and cuts through the salary noise.
+
+## Then trust your gut
+
+Once the analysis is done, notice your instinct. Often you already know which one you want and are looking for permission. If both are genuinely good, you can't make a "wrong" choice — and few first jobs are permanent. Pick the one that sets up the *next* move, be gracious to the firm you turn down, and commit fully to the one you accept.`,
+  },
 ];
 
 type EventSeed = {
@@ -680,6 +868,16 @@ function slugifyAuthorDate(iso: string) {
   return new Date(iso);
 }
 
+/**
+ * Reading time at a considered pace (~150 wpm — advice content with lists,
+ * technical terms and points people actually absorb, not skim). Computed
+ * from the body; the manual readMinutes in the seed are ignored.
+ */
+function readingTime(body: string): number {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 150));
+}
+
 async function main() {
   const { PrismaClient } = await import("@prisma/client");
   const { PrismaPg } = await import("@prisma/adapter-pg");
@@ -705,7 +903,7 @@ async function main() {
         body: a.body,
         category: a.category,
         tags: a.tags,
-        readMinutes: a.readMinutes,
+        readMinutes: readingTime(a.body),
         authorName: a.author,
         published: true,
         publishedAt: slugifyAuthorDate(a.publishedAt),

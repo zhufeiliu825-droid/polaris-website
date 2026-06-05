@@ -66,7 +66,9 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
     () => state.body.trim().split(/\s+/).filter(Boolean).length,
     [state.body]
   );
-  const computedMinutes = Math.max(1, Math.round(words / 200));
+  // ~150 wpm = considered reading pace for advice content. Kept in sync with
+  // scripts/seed-content.ts so editor estimates match seeded articles.
+  const computedMinutes = Math.max(1, Math.round(words / 150));
 
   // Title + slug are the minimum for a publishable article. While either is
   // empty, the Publish toggle is forced off + disabled.
@@ -217,7 +219,9 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
               className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
             />
           </Field>
-          <input type="hidden" name="readMinutes" value={state.readMinutes} />
+          {/* readMinutes auto-tracks the body word count so staff never have
+              to set it manually (and it can't drift stale). */}
+          <input type="hidden" name="readMinutes" value={computedMinutes} />
         </Section>
       </div>
 

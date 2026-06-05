@@ -95,58 +95,45 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
             </div>
           ) : (
             <>
-              {/* FEATURED row — admin-curated. 1 article → full-width card.
-                  2+ articles → side-by-side. Skipped when a category filter
-                  is active. */}
-              {featured.length > 0 && (
-                <ul
-                  className={
-                    "mb-12 grid gap-6 " +
-                    (featured.length === 1
-                      ? "grid-cols-1"
-                      : featured.length === 2
-                        ? "grid-cols-1 md:grid-cols-2"
-                        : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")
-                  }
-                >
-                  {featured.map((f) => (
-                    <li key={f.id}>
-                      <Link
-                        href={`/advice/${f.slug}`}
-                        className="group block h-full bg-navy-950 rounded-3xl p-8 md:p-10 relative overflow-hidden text-white hover:bg-navy-900 transition-colors"
-                      >
-                        <div
-                          className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
-                          aria-hidden="true"
-                        />
-                        <div className="relative flex flex-col h-full">
-                          <p className="text-xs uppercase tracking-widest text-sand-300 font-semibold">
-                            Featured · {f.category}
-                          </p>
-                          <h2 className="mt-4 text-2xl md:text-3xl font-light tracking-tight leading-tight">
-                            {f.title}
-                          </h2>
-                          <p className="mt-4 text-base text-navy-100 line-clamp-3">
-                            {f.excerpt}
-                          </p>
-                          <div className="mt-auto pt-6 flex items-center gap-3 text-sm">
-                            <span className="inline-flex items-center gap-1.5 text-navy-200">
-                              <Clock className="h-4 w-4" /> {f.readMinutes} min
-                            </span>
-                            <span className="text-navy-300">·</span>
-                            <span className="text-navy-200">
-                              {formatPublishedDate(f.publishedAt)}
-                            </span>
-                          </div>
-                          <div className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand-200 group-hover:gap-3 transition-all">
-                            Read article <ArrowRight className="h-4 w-4" />
-                          </div>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {/* FEATURED row — admin-curated, skipped when a category filter
+                  is active. 1–3 featured → responsive grid. 4+ featured →
+                  a horizontal scroll carousel (CSS scroll-snap, no JS) so the
+                  page doesn't stack rows of heavy navy cards. */}
+              {featured.length > 0 &&
+                (featured.length <= 3 ? (
+                  <ul
+                    className={
+                      "mb-12 grid gap-6 " +
+                      (featured.length === 1
+                        ? "grid-cols-1"
+                        : featured.length === 2
+                          ? "grid-cols-1 md:grid-cols-2"
+                          : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")
+                    }
+                  >
+                    {featured.map((f) => (
+                      <li key={f.id}>
+                        <FeaturedCard f={f} />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="mb-12 -mx-4 px-4">
+                    <ul className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:thin]">
+                      {featured.map((f) => (
+                        <li
+                          key={f.id}
+                          className="snap-start shrink-0 w-[88%] sm:w-[60%] lg:w-[31%]"
+                        >
+                          <FeaturedCard f={f} />
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-xs text-navy-400 -mt-2">
+                      Scroll for more featured articles →
+                    </p>
+                  </div>
+                ))}
 
               {/* GRID — when filtered, show ALL filtered articles in grid */}
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -180,5 +167,52 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
         </Container>
       </section>
     </>
+  );
+}
+
+function FeaturedCard({
+  f,
+}: {
+  f: {
+    id: string;
+    slug: string;
+    title: string;
+    excerpt: string;
+    category: string;
+    readMinutes: number;
+    publishedAt: Date | null;
+  };
+}) {
+  return (
+    <Link
+      href={`/advice/${f.slug}`}
+      className="group block h-full bg-navy-950 rounded-3xl p-8 md:p-10 relative overflow-hidden text-white hover:bg-navy-900 transition-colors"
+    >
+      <div
+        className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
+        aria-hidden="true"
+      />
+      <div className="relative flex flex-col h-full">
+        <p className="text-xs uppercase tracking-widest text-sand-300 font-semibold">
+          Featured · {f.category}
+        </p>
+        <h2 className="mt-4 text-2xl md:text-3xl font-light tracking-tight leading-tight">
+          {f.title}
+        </h2>
+        <p className="mt-4 text-base text-navy-100 line-clamp-3">{f.excerpt}</p>
+        <div className="mt-auto pt-6 flex items-center gap-3 text-sm">
+          <span className="inline-flex items-center gap-1.5 text-navy-200">
+            <Clock className="h-4 w-4" /> {f.readMinutes} min
+          </span>
+          <span className="text-navy-300">·</span>
+          <span className="text-navy-200">
+            {formatPublishedDate(f.publishedAt)}
+          </span>
+        </div>
+        <div className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand-200 group-hover:gap-3 transition-all">
+          Read article <ArrowRight className="h-4 w-4" />
+        </div>
+      </div>
+    </Link>
   );
 }
