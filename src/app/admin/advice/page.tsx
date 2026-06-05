@@ -11,7 +11,7 @@ export default async function AdminAdvicePage() {
   });
 
   return (
-    <div className="px-8 py-10">
+    <div className="px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
       <div className="flex items-baseline justify-between mb-8 flex-wrap gap-4">
         <div>
           <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">

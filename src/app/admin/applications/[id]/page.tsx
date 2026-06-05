@@ -62,7 +62,7 @@ export default async function ApplicationDetailPage({
     d.toLocaleString("en-GB", { dateStyle: "long", timeStyle: "short" });
 
   return (
-    <div className="px-8 py-10 max-w-6xl">
+    <div className="px-4 sm:px-6 lg:px-8 py-8 lg:py-10 max-w-6xl">
       <Link
         href="/admin/applications"
         className="inline-flex items-center gap-2 text-sm text-navy-600 hover:text-navy-950 mb-6"

@@ -11,7 +11,7 @@ export default async function AdminEventsPage() {
   const upcoming = events.filter((e) => e.startsAt > new Date()).length;
 
   return (
-    <div className="px-8 py-10">
+    <div className="px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
       <div className="flex items-baseline justify-between mb-8 flex-wrap gap-4">
         <div>
           <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
@@ -29,8 +29,8 @@ export default async function AdminEventsPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-2xl border border-navy-100 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-2xl border border-navy-100 overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-navy-50 text-xs uppercase tracking-widest text-navy-700">
             <tr>
               <th className="text-left font-semibold px-5 py-3">Event</th>
