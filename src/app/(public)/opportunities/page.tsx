@@ -124,8 +124,8 @@ export default async function OpportunitiesPage({
     <>
       <PageHero
         eyebrow="Opportunities"
-        title="Graduate jobs, internships and schemes — handpicked."
-        subtitle={`A curated feed of ${fmtCount(counts.total)} live opportunities. Refreshed daily from Reed and partner employers.`}
+        title="Find graduate jobs, internships and opportunities that actually fit you."
+        subtitle="Curated opportunities for ambitious students and graduates — career opportunities across the UK."
       />
 
       <section className="bg-paper py-12">

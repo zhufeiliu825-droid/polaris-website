@@ -55,8 +55,8 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
     <>
       <PageHero
         eyebrow="Career advice"
-        title="Practical guidance from people who hire graduates."
-        subtitle="From writing your CV to surviving an assessment centre — straight talk, no fluff."
+        title="Career advice built for international students and graduates."
+        subtitle="CVs, interviews, applications and career strategy — practical guidance for landing better opportunities."
       />
 
       <section className="py-16 bg-paper">

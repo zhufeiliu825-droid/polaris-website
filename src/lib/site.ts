@@ -20,7 +20,7 @@ export const siteConfig = {
   nav: [
     { href: "/opportunities", label: "Opportunities" },
     { href: "/events", label: "Events" },
-    { href: "/advice", label: "Advice" },
+    { href: "/advice", label: "Career advice" },
     { href: "/services", label: "Services" },
   ],
   industries: [

@@ -99,8 +99,8 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
     <>
       <PageHero
         eyebrow="Events"
-        title="Workshops, talks and panels — live with industry insiders."
-        subtitle="Online webinars and in-person events at our London office. All free for Polaris members."
+        title="Meet recruiters, employers and ambitious graduates."
+        subtitle="Workshops, networking events and career sessions designed to help you build connections that matter."
       />
 
       <section className="py-16 bg-paper">
