@@ -73,7 +73,7 @@ export default async function AdminApplicationsPage({
             name="q"
             defaultValue={sp.q ?? ""}
             placeholder="Search name, email, university or course…"
-            className="w-full h-10 pl-9 pr-4 rounded-full border border-navy-200 text-sm focus:outline-none focus:border-navy-900 bg-white"
+            className="w-full h-10 pl-9 pr-4 rounded-full border border-navy-200 text-sm field-focus focus:outline-none focus:border-navy-900 bg-white"
           />
         </div>
         {status !== "All" && (

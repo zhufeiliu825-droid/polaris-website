@@ -264,6 +264,9 @@ export function JoinForm() {
         </div>
       )}
 
+      {/* key={step} remounts this wrapper on every step change so the
+          step content gets a subtle fade/slide instead of an instant cut. */}
+      <div key={step} className="animate-step-in">
       {/* ── Step 1 ────────────────────────────────────────────── */}
       {step === 1 && (
         <div className="space-y-5">
@@ -507,6 +510,7 @@ export function JoinForm() {
           </div>
         </div>
       )}
+      </div>
 
       {/* Footer */}
       <div className="mt-10 pt-6 border-t border-navy-100 flex items-center justify-between gap-4">
@@ -584,7 +588,7 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           required={required}
           className={
-            "w-full h-11 px-4 rounded-xl border border-navy-200 text-navy-900 focus:outline-none focus:border-navy-900 " +
+            "w-full h-11 px-4 rounded-xl border border-navy-200 text-navy-900 field-focus focus:outline-none focus:border-navy-900 " +
             (Icon ? "pl-9 " : "")
           }
         />
@@ -618,7 +622,7 @@ function Select({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
-        className="w-full h-11 px-4 rounded-xl border border-navy-200 text-navy-900 bg-white focus:outline-none focus:border-navy-900"
+        className="w-full h-11 px-4 rounded-xl border border-navy-200 text-navy-900 bg-white field-focus focus:outline-none focus:border-navy-900"
       >
         <option value="" disabled>
           Please select…
@@ -669,7 +673,7 @@ function Textarea({
         placeholder={placeholder}
         rows={rows}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 rounded-xl border border-navy-200 text-navy-900 focus:outline-none focus:border-navy-900"
+        className="w-full px-4 py-3 rounded-xl border border-navy-200 text-navy-900 field-focus focus:outline-none focus:border-navy-900"
       />
       <div className="mt-1.5 flex items-center justify-between text-xs text-navy-500">
         <span>{hint}</span>

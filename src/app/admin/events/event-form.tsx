@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Save, Eye } from "lucide-react";
 
 type EventInitial = {
@@ -88,7 +88,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
                 if (!isEdit) set("slug", slugify(e.target.value));
               }}
               required
-              className="w-full h-11 px-4 rounded-lg border border-navy-200 text-navy-900 focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-lg border border-navy-200 text-navy-900 field-focus focus:outline-none focus:border-navy-900"
             />
           </Field>
           <Field label="URL slug" hint="Lowercase letters, numbers, hyphens">
@@ -98,7 +98,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
               value={state.slug}
               onChange={(e) => set("slug", e.target.value)}
               required
-              className="w-full h-11 px-4 rounded-lg border border-navy-200 text-navy-900 font-mono text-sm focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-lg border border-navy-200 text-navy-900 font-mono text-sm field-focus focus:outline-none focus:border-navy-900"
             />
             <p className="mt-1.5 text-xs text-navy-500">
               /events/<strong className="text-navy-700">{state.slug || "your-slug"}</strong>
@@ -111,7 +111,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
               value={state.excerpt}
               onChange={(e) => set("excerpt", e.target.value)}
               maxLength={180}
-              className="w-full h-11 px-4 rounded-lg border border-navy-200 text-navy-900 focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-lg border border-navy-200 text-navy-900 field-focus focus:outline-none focus:border-navy-900"
             />
           </Field>
         </Section>
@@ -155,7 +155,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
                 name="format"
                 value={state.format}
                 onChange={(e) => set("format", e.target.value as typeof state.format)}
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 bg-white focus:outline-none focus:border-navy-900"
+                className="w-full h-11 px-4 rounded-lg border border-navy-200 bg-white field-focus focus:outline-none focus:border-navy-900"
               >
                 <option value="ONLINE">Online</option>
                 <option value="IN_PERSON">In person</option>
@@ -166,7 +166,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
                 name="sector"
                 value={state.sector ?? ""}
                 onChange={(e) => set("sector", e.target.value)}
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 bg-white focus:outline-none focus:border-navy-900"
+                className="w-full h-11 px-4 rounded-lg border border-navy-200 bg-white field-focus focus:outline-none focus:border-navy-900"
               >
                 <option value="">— No tag —</option>
                 {["Finance", "Accounting", "Consulting", "Engineering", "Law", "Marketing"].map((s) => (
@@ -181,7 +181,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
               name="location"
               value={state.location}
               onChange={(e) => set("location", e.target.value)}
-              className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-lg border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
             />
           </Field>
         </Section>
@@ -194,7 +194,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
               onChange={(e) => set("body", e.target.value)}
               rows={16}
               placeholder="## What we'll cover&#10;- Topic 1&#10;- Topic 2&#10;&#10;Bring …"
-              className="w-full px-4 py-3 rounded-lg border border-navy-200 font-mono text-sm focus:outline-none focus:border-navy-900"
+              className="w-full px-4 py-3 rounded-lg border border-navy-200 font-mono text-sm field-focus focus:outline-none focus:border-navy-900"
             />
           </Field>
         </Section>
@@ -207,7 +207,7 @@ export function EventForm({ initial, isEdit, action }: Props) {
                 value={state.registrationUrl}
                 onChange={(e) => set("registrationUrl", e.target.value)}
                 placeholder="https://www.eventbrite…"
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+                className="w-full h-11 px-4 rounded-lg border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
               />
             </Field>
         </Section>
@@ -245,16 +245,16 @@ export function EventForm({ initial, isEdit, action }: Props) {
             <div className="mb-5" />
           )}
 
-          <Button
-            type="submit"
+          <SubmitButton
             variant="primary"
             size="md"
             className="w-full"
             disabled={!!timeError}
+            pendingLabel="Saving…"
           >
             <Save className="h-4 w-4" />
             {isEdit ? "Save changes" : "Create event"}
-          </Button>
+          </SubmitButton>
 
           {state.published && state.slug && (
             <a

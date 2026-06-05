@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Logo } from "@/components/logo";
 import { signIn, signOut } from "./actions";
 
@@ -55,7 +55,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
               autoComplete="username"
               autoCapitalize="none"
               spellCheck={false}
-              className="w-full h-11 px-4 rounded-xl border border-navy-200 focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-xl border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
             />
           </div>
           <div>
@@ -69,13 +69,18 @@ export default async function AdminLoginPage({ searchParams }: Props) {
               name="password"
               required
               autoComplete="current-password"
-              className="w-full h-11 px-4 rounded-xl border border-navy-200 focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-xl border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
             />
           </div>
 
-          <Button type="submit" variant="primary" size="lg" className="w-full">
+          <SubmitButton
+            variant="primary"
+            size="lg"
+            className="w-full"
+            pendingLabel="Signing in…"
+          >
             Sign in
-          </Button>
+          </SubmitButton>
         </form>
 
         <p className="mt-8 text-xs text-navy-500 text-center">

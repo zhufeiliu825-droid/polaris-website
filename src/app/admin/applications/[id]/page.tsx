@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { StatusPill } from "../../page";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { updateApplication, deleteApplication } from "../actions";
 import { SavedBanner } from "../../saved-banner";
 import {
@@ -273,9 +273,14 @@ export default async function ApplicationDetailPage({
               placeholder="What you talked about, follow-ups, anything…"
             />
 
-            <Button type="submit" variant="primary" size="md" className="w-full">
+            <SubmitButton
+              variant="primary"
+              size="md"
+              className="w-full"
+              pendingLabel="Saving…"
+            >
               Save changes
-            </Button>
+            </SubmitButton>
             <p className="text-xs text-navy-500">
               Saves <em>everything</em> on this page — contact info, education,
               career direction, and the workflow fields above.
@@ -328,7 +333,7 @@ function Field({
         defaultValue={defaultValue}
         placeholder={placeholder}
         required={required}
-        className="w-full h-10 px-3 rounded-lg border border-navy-200 text-sm focus:outline-none focus:border-navy-900"
+        className="w-full h-10 px-3 rounded-lg border border-navy-200 text-sm field-focus focus:outline-none focus:border-navy-900"
       />
     </div>
   );
@@ -353,7 +358,7 @@ function Select({
       <select
         name={name}
         defaultValue={defaultValue}
-        className="w-full h-10 px-3 rounded-lg border border-navy-200 text-sm bg-white focus:outline-none focus:border-navy-900"
+        className="w-full h-10 px-3 rounded-lg border border-navy-200 text-sm bg-white field-focus focus:outline-none focus:border-navy-900"
       >
         <option value="">— Not set —</option>
         {options.map((o, i) =>
@@ -397,7 +402,7 @@ function Textarea({
         defaultValue={defaultValue}
         rows={rows}
         placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm focus:outline-none focus:border-navy-900"
+        className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm field-focus focus:outline-none focus:border-navy-900"
       />
       {hint && <p className="mt-1 text-xs text-navy-500">{hint}</p>}
     </div>

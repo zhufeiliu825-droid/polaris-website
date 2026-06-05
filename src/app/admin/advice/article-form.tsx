@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Save, Eye, FileText, Pencil } from "lucide-react";
 import { Markdown } from "@/components/markdown";
 type ArticleInitial = {
@@ -89,7 +89,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
                 if (!isEdit) set("slug", slugify(e.target.value));
               }}
               required
-              className="w-full h-12 px-4 rounded-lg border border-navy-200 text-lg text-navy-900 focus:outline-none focus:border-navy-900"
+              className="w-full h-12 px-4 rounded-lg border border-navy-200 text-lg text-navy-900 field-focus focus:outline-none focus:border-navy-900"
               placeholder="Writing a finance CV that passes the 15-second test"
             />
           </Field>
@@ -100,7 +100,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
               value={state.slug}
               onChange={(e) => set("slug", e.target.value)}
               required
-              className="w-full h-11 px-4 rounded-lg border border-navy-200 font-mono text-sm focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-lg border border-navy-200 font-mono text-sm field-focus focus:outline-none focus:border-navy-900"
             />
             <p className="mt-1.5 text-xs text-navy-500">
               /advice/<strong className="text-navy-700">{state.slug || "your-slug"}</strong>
@@ -113,7 +113,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
               onChange={(e) => set("excerpt", e.target.value)}
               rows={2}
               maxLength={220}
-              className="w-full px-4 py-3 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+              className="w-full px-4 py-3 rounded-lg border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
             />
             <p className="mt-1.5 text-xs text-navy-500 text-right">
               {state.excerpt.length}/220
@@ -161,7 +161,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
             rows={24}
             placeholder={`# Your headline\n\nFirst paragraph hooks the reader…\n\n## A sub-heading\n\n- A point\n- Another point\n\nLink: [Polaris](https://polarisconsulting.uk)`}
             className={
-              "w-full px-4 py-4 rounded-lg border border-navy-200 font-mono text-sm leading-relaxed focus:outline-none focus:border-navy-900 " +
+              "w-full px-4 py-4 rounded-lg border border-navy-200 font-mono text-sm leading-relaxed field-focus focus:outline-none focus:border-navy-900 " +
               (tab === "write" ? "" : "hidden")
             }
           />
@@ -190,7 +190,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
                 name="category"
                 value={state.category}
                 onChange={(e) => set("category", e.target.value)}
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 bg-white focus:outline-none focus:border-navy-900"
+                className="w-full h-11 px-4 rounded-lg border border-navy-200 bg-white field-focus focus:outline-none focus:border-navy-900"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -205,7 +205,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
                 name="authorName"
                 value={state.authorName}
                 onChange={(e) => set("authorName", e.target.value)}
-                className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+                className="w-full h-11 px-4 rounded-lg border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
               />
             </Field>
           </div>
@@ -216,7 +216,7 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
               value={state.tags}
               onChange={(e) => set("tags", e.target.value)}
               placeholder="CV, finance, applications"
-              className="w-full h-11 px-4 rounded-lg border border-navy-200 focus:outline-none focus:border-navy-900"
+              className="w-full h-11 px-4 rounded-lg border border-navy-200 field-focus focus:outline-none focus:border-navy-900"
             />
           </Field>
           {/* readMinutes auto-tracks the body word count so staff never have
@@ -283,10 +283,15 @@ export function ArticleForm({ initial, isEdit, action }: Props) {
             </span>
           </label>
 
-          <Button type="submit" variant="primary" size="md" className="w-full">
+          <SubmitButton
+            variant="primary"
+            size="md"
+            className="w-full"
+            pendingLabel="Saving…"
+          >
             <Save className="h-4 w-4" />
             {isEdit ? "Save changes" : "Save draft"}
-          </Button>
+          </SubmitButton>
 
           {state.published && state.slug && (
             <a

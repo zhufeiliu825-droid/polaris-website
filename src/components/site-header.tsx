@@ -39,8 +39,9 @@ export function SiteHeader() {
 
         <button
           type="button"
-          aria-label="Toggle menu"
+          aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
+          aria-controls="mobile-menu"
           className="lg:hidden p-2 text-navy-900"
           onClick={() => setOpen((v) => !v)}
         >
@@ -48,12 +49,18 @@ export function SiteHeader() {
         </button>
       </Container>
 
+      {/* grid-rows 0fr→1fr animates to the panel's true content height (vs a
+          guessed max-h), and `inert`/hidden when closed so its links aren't
+          keyboard/screen-reader focusable. */}
       <div
+        id="mobile-menu"
+        inert={!open}
         className={cn(
-          "lg:hidden border-t border-navy-100 bg-white overflow-hidden transition-all",
-          open ? "max-h-[600px]" : "max-h-0"
+          "lg:hidden border-t border-navy-100 bg-white grid transition-[grid-template-rows] duration-300 ease-out",
+          open ? "grid-rows-[1fr] border-b" : "grid-rows-[0fr] border-b-0"
         )}
       >
+        <div className="overflow-hidden">
         <Container className="py-4 flex flex-col gap-1">
           {siteConfig.nav.map((item) => (
             <Link
@@ -77,6 +84,7 @@ export function SiteHeader() {
             </ButtonLink>
           </div>
         </Container>
+        </div>
       </div>
     </header>
   );
