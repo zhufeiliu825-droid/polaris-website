@@ -21,11 +21,12 @@ const FORMAT_OPTIONS = [
   { key: "in-person", label: "In person" },
 ] as const;
 /**
- * Time chip — only Ongoing and Past. No "All" option because everything is
- * always one of the two; Ongoing is the default when no URL param is set.
+ * Time chip — only Upcoming and Past. No "All" option because everything is
+ * always one of the two; Upcoming is the default when no URL param is set.
+ * (The URL key stays "upcoming"; the where-clause keys off it directly.)
  */
 const WHEN_OPTIONS = [
-  { key: "ongoing", label: "Ongoing" },
+  { key: "upcoming", label: "Upcoming" },
   { key: "past", label: "Past" },
 ] as const;
 
@@ -69,7 +70,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
   const activeFormat: FormatKey =
     sp.format && validFormats.has(sp.format) ? (sp.format as FormatKey) : "all";
   const activeWhen: WhenKey =
-    sp.when && validWhens.has(sp.when) ? (sp.when as WhenKey) : "ongoing";
+    sp.when && validWhens.has(sp.when) ? (sp.when as WhenKey) : "upcoming";
 
   const now = new Date();
   const where = buildWhere(activeFormat, activeWhen, now);
@@ -90,7 +91,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
     const f = axis === "format" ? key : activeFormat;
     const w = axis === "when" ? key : activeWhen;
     if (f !== "all") next.set("format", f);
-    if (w !== "ongoing") next.set("when", w);
+    if (w !== "upcoming") next.set("when", w);
     const s = next.toString();
     return s ? `/events?${s}` : "/events";
   };
@@ -105,14 +106,16 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
 
       <section className="py-16 bg-paper">
         <Container>
-          {/* FILTER CHIPS — two independent axes */}
-          <div className="space-y-3 mb-10">
+          {/* FILTER CHIPS — two independent axes, Advice-page pill style */}
+          <div className="space-y-2.5 mb-10 border-b border-navy-100 pb-6">
             <ChipRow
+              label="Format"
               options={FORMAT_OPTIONS}
               activeKey={activeFormat}
               hrefFor={(k) => hrefFor("format", k)}
             />
             <ChipRow
+              label="When"
               options={WHEN_OPTIONS}
               activeKey={activeWhen}
               hrefFor={(k) => hrefFor("when", k)}
@@ -204,33 +207,41 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
 }
 
 function ChipRow({
+  label,
   options,
   activeKey,
   hrefFor,
 }: {
+  label: string;
   options: readonly { key: string; label: string }[];
   activeKey: string;
   hrefFor: (key: string) => string;
 }) {
   return (
-    <div className="flex gap-2 flex-wrap">
-      {options.map((o) => {
-        const isActive = o.key === activeKey;
-        return (
-          <Link
-            key={o.key}
-            href={hrefFor(o.key)}
-            scroll={false}
-            className={
-              isActive
-                ? "h-10 px-5 inline-flex items-center rounded-full bg-sand-100 text-navy-950 text-sm font-medium"
-                : "h-10 px-5 inline-flex items-center rounded-full bg-white border border-navy-200 text-sm font-medium text-navy-700 hover:bg-navy-50"
-            }
-          >
-            {o.label}
-          </Link>
-        );
-      })}
+    <div className="flex items-baseline gap-x-3 gap-y-2 flex-wrap">
+      <span className="text-xs uppercase tracking-widest text-navy-900 font-semibold w-14 shrink-0">
+        {label}
+      </span>
+      <div className="flex gap-2 flex-wrap">
+        {options.map((o) => {
+          const isActive = o.key === activeKey;
+          return (
+            <Link
+              key={o.key}
+              href={hrefFor(o.key)}
+              scroll={false}
+              className={
+                "h-9 px-4 inline-flex items-center rounded-full text-sm font-medium " +
+                (isActive
+                  ? "bg-navy-950 text-white"
+                  : "text-navy-700 hover:bg-navy-50")
+              }
+            >
+              {o.label}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
