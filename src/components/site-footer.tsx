@@ -38,17 +38,13 @@ const footerNav = [
       { href: "/contact", label: "Contact" },
     ],
   },
-  {
-    title: "Get in touch",
-    links: [{ href: "/join#form", label: "Contact us" }],
-  },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="bg-navy-950 text-navy-100">
       <Container className="py-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
           <div>
             <Link href="/" className="inline-flex">
               <Logo variant="white" />
