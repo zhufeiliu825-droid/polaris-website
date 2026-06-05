@@ -3,20 +3,20 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Markdown } from "@/components/markdown";
-import { prisma } from "@/lib/db";
+import { getArticleBySlug, getPublishedArticles } from "@/lib/content";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const a = await prisma.article.findUnique({ where: { slug } });
+  const a = await getArticleBySlug(slug);
   if (!a || !a.published) return { title: "Article not found" };
   return { title: a.title, description: a.excerpt };
 }
 
 export default async function AdviceDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const article = await prisma.article.findUnique({ where: { slug } });
+  const article = await getArticleBySlug(slug);
   if (!article || !article.published) notFound();
 
   const publishedDate = article.publishedAt
@@ -27,16 +27,10 @@ export default async function AdviceDetailPage({ params }: PageProps) {
       })
     : null;
 
-  // Related: same category, exclude self.
-  const related = await prisma.article.findMany({
-    where: {
-      published: true,
-      category: article.category,
-      id: { not: article.id },
-    },
-    orderBy: { publishedAt: "desc" },
-    take: 3,
-  });
+  // Related: same category, exclude self (derived from the cached set).
+  const related = (await getPublishedArticles())
+    .filter((a) => a.category === article.category && a.id !== article.id)
+    .slice(0, 3);
 
   return (
     <article className="bg-paper">

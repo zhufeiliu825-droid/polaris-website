@@ -3,7 +3,7 @@ import { Clock, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
 import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
-import { prisma } from "@/lib/db";
+import { getPublishedArticles } from "@/lib/content";
 
 export const metadata = {
   title: "Career advice",
@@ -33,25 +33,14 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
   const sp = await searchParams;
   const activeCategory = sp.category && sp.category !== "All" ? sp.category : null;
 
-  // When viewing All: fetch the featured row separately and the rest below.
-  // When a category filter is active, drop the featured row entirely and just
-  // show the filtered grid — featured cards are meant for the index, not for
-  // category-specific browsing.
-  const [featured, articles] = await Promise.all([
-    activeCategory
-      ? Promise.resolve([])
-      : prisma.article.findMany({
-          where: { published: true, isFeatured: true },
-          orderBy: { publishedAt: "desc" },
-        }),
-    prisma.article.findMany({
-      where: {
-        published: true,
-        ...(activeCategory ? { category: activeCategory } : {}),
-      },
-      orderBy: { publishedAt: "desc" },
-    }),
-  ]);
+  // One cached fetch of all published articles; filter + featured-split in JS.
+  // When a category filter is active, drop the featured row entirely — featured
+  // cards are meant for the index, not category-specific browsing.
+  const published = await getPublishedArticles();
+  const articles = activeCategory
+    ? published.filter((a) => a.category === activeCategory)
+    : published;
+  const featured = activeCategory ? [] : published.filter((a) => a.isFeatured);
 
   // Exclude featured articles from the main grid so they don't appear twice.
   const featuredIds = new Set(featured.map((f) => f.id));

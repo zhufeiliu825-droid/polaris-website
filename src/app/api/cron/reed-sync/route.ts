@@ -12,6 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { runReedSync } from "@/lib/reed-sync";
 
 // Reed can return ~500 jobs across all sectors → a few hundred upserts.
@@ -34,6 +35,9 @@ export async function GET(req: NextRequest) {
   const result = await runReedSync({
     log: (m) => console.log("[cron]", m),
   });
+
+  // Bust the cached opportunities reads so the fresh feed is served immediately.
+  if (result.ok) revalidateTag("jobs", "max");
 
   return NextResponse.json(result, {
     status: result.ok ? 200 : 500,

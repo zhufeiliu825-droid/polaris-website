@@ -3,8 +3,7 @@ import { Calendar, MapPin, ArrowRight, Globe2 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
 import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
-import { prisma } from "@/lib/db";
-import type { Prisma } from "@prisma/client";
+import { getPublishedEvents } from "@/lib/content";
 
 export const metadata = {
   title: "Events",
@@ -39,15 +38,6 @@ const WHEN_OPTIONS = [
 type FormatKey = (typeof FORMAT_OPTIONS)[number]["key"];
 type WhenKey = (typeof WHEN_OPTIONS)[number]["key"];
 
-function buildWhere(format: FormatKey, when: WhenKey, now: Date): Prisma.EventWhereInput {
-  const where: Prisma.EventWhereInput = { published: true };
-  if (format === "online") where.format = "ONLINE";
-  if (format === "in-person") where.format = "IN_PERSON";
-  if (when === "past") where.endsAt = { lt: now };
-  else where.endsAt = { gte: now }; // "ongoing"
-  return where;
-}
-
 function formatEventDateTime(starts: Date, ends: Date): { date: string; time: string } {
   const date = starts.toLocaleDateString("en-GB", {
     weekday: "short",
@@ -79,13 +69,22 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
     sp.when && validWhens.has(sp.when) ? (sp.when as WhenKey) : "upcoming";
 
   const now = new Date();
-  const where = buildWhere(activeFormat, activeWhen, now);
 
-  // Past events sorted newest first; everything else soonest first.
-  const orderBy: Prisma.EventOrderByWithRelationInput =
-    activeWhen === "past" ? { startsAt: "desc" } : { startsAt: "asc" };
-
-  const events = await prisma.event.findMany({ where, orderBy });
+  // One cached fetch of all published events; filter by format + time and sort
+  // in JS so the cache key never depends on `now`.
+  const all = await getPublishedEvents();
+  const events = all
+    .filter((e) => {
+      if (activeFormat === "online" && e.format !== "ONLINE") return false;
+      if (activeFormat === "in-person" && e.format !== "IN_PERSON") return false;
+      const isPast = e.endsAt < now;
+      return activeWhen === "past" ? isPast : !isPast;
+    })
+    .sort((a, b) =>
+      activeWhen === "past"
+        ? b.startsAt.getTime() - a.startsAt.getTime()
+        : a.startsAt.getTime() - b.startsAt.getTime()
+    );
 
   /**
    * Builds the href for a chip in a given axis. Keeps the other axis's

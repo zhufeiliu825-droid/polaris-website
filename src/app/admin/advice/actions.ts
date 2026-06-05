@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 
@@ -35,6 +35,7 @@ export async function createArticle(formData: FormData) {
   });
   revalidatePath("/admin/advice");
   revalidatePath("/advice");
+  updateTag("articles");
   redirect(`/admin/advice/${article.id}`);
 }
 
@@ -57,6 +58,7 @@ export async function updateArticle(formData: FormData) {
   revalidatePath(`/admin/advice/${id}`);
   revalidatePath("/admin/advice");
   revalidatePath("/advice");
+  updateTag("articles");
   revalidatePath(`/advice/${slug}`);
   redirect(`/admin/advice/${id}?saved=1`);
 }
@@ -67,5 +69,6 @@ export async function deleteArticle(formData: FormData) {
   await prisma.article.delete({ where: { id } });
   revalidatePath("/admin/advice");
   revalidatePath("/advice");
+  updateTag("articles");
   redirect("/admin/advice");
 }

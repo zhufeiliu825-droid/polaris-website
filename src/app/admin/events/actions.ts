@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { EventFormat } from "@prisma/client";
@@ -19,6 +19,7 @@ export async function createEvent(formData: FormData) {
   });
   revalidatePath("/admin/events");
   revalidatePath("/events");
+  updateTag("events");
   redirect(`/admin/events/${event.id}`);
 }
 
@@ -41,6 +42,7 @@ export async function updateEvent(formData: FormData) {
   revalidatePath(`/admin/events/${id}`);
   revalidatePath("/admin/events");
   revalidatePath("/events");
+  updateTag("events");
   revalidatePath(`/events/${slug}`);
   // Hard-reload the edit page so the green "Changes saved" banner shows
   // and React's uncontrolled inputs pick up the saved values (same trick
@@ -54,6 +56,7 @@ export async function deleteEvent(formData: FormData) {
   await prisma.event.delete({ where: { id } });
   revalidatePath("/admin/events");
   revalidatePath("/events");
+  updateTag("events");
   redirect("/admin/events");
 }
 

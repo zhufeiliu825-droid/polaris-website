@@ -5,8 +5,23 @@
  * the public /opportunities page and the admin dashboard tile.
  */
 
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
+
+/**
+ * Job data changes once a day (the Reed cron). Cache all read paths under the
+ * "jobs" tag so anonymous page views become zero-DB cache hits; the cron route
+ * calls revalidateTag("jobs") after each sync to refresh.
+ */
+const JOBS_TAG = "jobs";
+const DAY = 86400;
+function cached<A extends unknown[], R>(
+  fn: (...args: A) => Promise<R>,
+  key: string
+) {
+  return unstable_cache(fn, [key], { tags: [JOBS_TAG], revalidate: DAY });
+}
 
 /**
  * The major UK cities we surface as their own filter chip. Anything not
@@ -129,7 +144,7 @@ function buildWhere(filter: JobFilter): Prisma.JobWhereInput {
   return where;
 }
 
-export async function listJobs(filter: JobFilter = {}): Promise<{
+async function listJobsUncached(filter: JobFilter = {}): Promise<{
   jobs: StoredJob[];
   total: number;
   fetchedAt: string;
@@ -157,7 +172,7 @@ export async function listJobs(filter: JobFilter = {}): Promise<{
   };
 }
 
-export async function getJob(id: string): Promise<StoredJob | null> {
+async function getJobUncached(id: string): Promise<StoredJob | null> {
   const row = await prisma.job.findUnique({ where: { id } });
   return row ? toStoredJob(row) : null;
 }
@@ -169,7 +184,7 @@ export async function getJob(id: string): Promise<StoredJob | null> {
  * per-city count under the active sector filter — so the user can see exactly
  * how many results they'd get for any single change.
  */
-export async function filterCounts(filter: {
+async function filterCountsUncached(filter: {
   sector?: string;
   city?: string;
 }): Promise<{
@@ -234,7 +249,7 @@ export async function filterCounts(filter: {
 }
 
 /** Convenience for the admin dashboard tile. */
-export async function jobsMetadata() {
+async function jobsMetadataUncached() {
   const [total, latest] = await Promise.all([
     prisma.job.count({ where: { isActive: true } }),
     prisma.jobSyncRun.findFirst({
@@ -248,3 +263,9 @@ export async function jobsMetadata() {
     fetchedAt: latest?.endedAt?.toISOString() ?? new Date(0).toISOString(),
   };
 }
+
+// ── Cached public read paths (tag "jobs", revalidated daily by the cron) ──
+export const listJobs = cached(listJobsUncached, "jobs-list");
+export const getJob = cached(getJobUncached, "jobs-detail");
+export const filterCounts = cached(filterCountsUncached, "jobs-counts");
+export const jobsMetadata = cached(jobsMetadataUncached, "jobs-meta");

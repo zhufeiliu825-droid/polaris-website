@@ -3,20 +3,20 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, MapPin, Globe2, Tag } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Markdown } from "@/components/markdown";
-import { prisma } from "@/lib/db";
+import { getEventBySlug } from "@/lib/content";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const e = await prisma.event.findUnique({ where: { slug } });
+  const e = await getEventBySlug(slug);
   if (!e || !e.published) return { title: "Event not found" };
   return { title: e.title, description: e.excerpt };
 }
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const e = await prisma.event.findUnique({ where: { slug } });
+  const e = await getEventBySlug(slug);
   if (!e || !e.published) notFound();
 
   const isOnline = e.format === "ONLINE";
