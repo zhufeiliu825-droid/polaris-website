@@ -139,6 +139,9 @@ export function JoinForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Show the email-format error only after the field loses focus, so we don't
+  // nag mid-typing. Continue stays disabled until the address is valid either way.
+  const [emailTouched, setEmailTouched] = useState(false);
 
   // Track which fields are non-empty to compute progress and reward completion.
   const filledCount = useMemo(() => countFilled(state), [state]);
@@ -160,6 +163,10 @@ export function JoinForm() {
   };
 
   const canAdvance = stepIsValid(step, state);
+  const emailError =
+    emailTouched && state.email.trim() && !isValidEmail(state.email)
+      ? "Enter a valid email address (e.g. you@example.com)."
+      : undefined;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -291,6 +298,8 @@ export function JoinForm() {
               required
               value={state.email}
               onChange={(v) => update("email", v)}
+              onBlur={() => setEmailTouched(true)}
+              error={emailError}
               hint="We&apos;ll send your confirmation here."
             />
             <Field
@@ -561,7 +570,9 @@ function Field({
   hint,
   value,
   onChange,
+  onBlur,
   icon: Icon,
+  error,
 }: {
   label: string;
   type?: string;
@@ -570,7 +581,9 @@ function Field({
   hint?: string;
   value: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
   icon?: React.ComponentType<{ className?: string }>;
+  error?: string;
 }) {
   return (
     <div>
@@ -586,14 +599,23 @@ function Field({
           value={value}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
           required={required}
+          aria-invalid={error ? true : undefined}
           className={
-            "w-full h-11 px-4 rounded-xl border border-navy-200 text-navy-900 field-focus focus:outline-none focus:border-navy-900 " +
+            "w-full h-11 px-4 rounded-xl border text-navy-900 field-focus focus:outline-none " +
+            (error
+              ? "border-red-300 focus:border-red-500 "
+              : "border-navy-200 focus:border-navy-900 ") +
             (Icon ? "pl-9 " : "")
           }
         />
       </div>
-      {hint && <p className="mt-1.5 text-xs text-navy-500">{hint}</p>}
+      {error ? (
+        <p className="mt-1.5 text-xs text-red-600">{error}</p>
+      ) : hint ? (
+        <p className="mt-1.5 text-xs text-navy-500">{hint}</p>
+      ) : null}
     </div>
   );
 }
@@ -829,11 +851,16 @@ function countFilled(s: FormState): number {
 // count them. If you add/remove a field above, update this number too.
 const TOTAL_ASKABLE = 21;
 
+/** Practical email check: one @, no spaces, a dot in the domain. Mirrors the
+ *  server-side guard in actions.ts so client and server agree. */
+function isValidEmail(s: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+}
+
 function stepIsValid(step: number, s: FormState): boolean {
   if (step === 1) {
-    return Boolean(
-      s.firstName && s.lastName && s.email && s.phone
-    );
+    // Email must be a valid format (not just non-empty) before Continue enables.
+    return Boolean(s.firstName && s.lastName && s.phone) && isValidEmail(s.email);
   }
   if (step === 3) {
     return Boolean(

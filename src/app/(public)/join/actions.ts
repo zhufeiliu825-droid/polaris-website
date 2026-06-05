@@ -16,7 +16,7 @@ export async function submitJoin(payload: JoinPayload): Promise<{ id: string }> 
   if (!payload.firstName?.trim() || !payload.lastName?.trim()) {
     throw new Error("Name is required");
   }
-  if (!payload.email?.trim() || !/\S+@\S+\.\S+/.test(payload.email)) {
+  if (!payload.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email.trim())) {
     throw new Error("A valid email is required");
   }
   if (!payload.phone?.trim()) {
