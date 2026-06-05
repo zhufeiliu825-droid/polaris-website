@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Calendar, MapPin, ArrowRight, Globe2 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
+import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 
@@ -106,6 +107,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
 
       <section className="py-16 bg-paper">
         <Container>
+          <FilteringProvider>
           {/* FILTER CHIPS — two independent axes, Advice-page pill style */}
           <div className="space-y-2.5 mb-10 border-b border-navy-100 pb-6">
             <ChipRow
@@ -121,6 +123,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
               hrefFor={(k) => hrefFor("when", k)}
             />
           </div>
+          <FilterResults>
 
           {events.length === 0 ? (
             <div className="bg-white border border-navy-100 rounded-2xl p-12 text-center">
@@ -200,6 +203,8 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
               })}
             </ul>
           )}
+          </FilterResults>
+          </FilteringProvider>
         </Container>
       </section>
     </>
@@ -226,19 +231,19 @@ function ChipRow({
         {options.map((o) => {
           const isActive = o.key === activeKey;
           return (
-            <Link
+            <FilterPill
               key={o.key}
               href={hrefFor(o.key)}
-              scroll={false}
+              active={isActive}
               className={
-                "h-9 px-4 inline-flex items-center rounded-full text-sm font-medium " +
+                "h-9 px-4 rounded-full text-sm font-medium " +
                 (isActive
                   ? "bg-navy-950 text-white"
                   : "text-navy-700 hover:bg-navy-50")
               }
             >
               {o.label}
-            </Link>
+            </FilterPill>
           );
         })}
       </div>

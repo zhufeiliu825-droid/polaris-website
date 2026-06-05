@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
+import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
 import {
   listJobs,
   filterCounts,
@@ -138,6 +139,7 @@ export default async function OpportunitiesPage({
 
       <section className="bg-paper py-12">
         <Container>
+          <FilteringProvider>
           {/* SEARCH + FILTERS — top bar, matching the Advice page style */}
           <div className="border-b border-navy-100 pb-6 mb-8 space-y-5">
             <form action="/opportunities" method="get" className="max-w-md">
@@ -147,8 +149,9 @@ export default async function OpportunitiesPage({
                   name="q"
                   type="search"
                   defaultValue={q}
+                  aria-label="Search opportunities by title or employer"
                   placeholder="Search title or employer…"
-                  className="w-full h-11 pl-9 pr-4 rounded-full border border-navy-200 text-sm focus:outline-none focus:border-navy-900"
+                  className="w-full h-11 pl-9 pr-4 rounded-full border border-navy-200 text-sm field-focus focus:outline-none focus:border-navy-900"
                 />
               </div>
               {sector && <input type="hidden" name="sector" value={sector} />}
@@ -198,6 +201,7 @@ export default async function OpportunitiesPage({
             </PillRow>
           </div>
 
+          <FilterResults>
           {/* RESULT META */}
           <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <p className="text-sm text-navy-600">
@@ -355,6 +359,8 @@ export default async function OpportunitiesPage({
               Reed.co.uk
             </a>
           </p>
+          </FilterResults>
+          </FilteringProvider>
         </Container>
       </section>
     </>
@@ -387,11 +393,11 @@ function Pill({
   count: string;
 }) {
   return (
-    <Link
+    <FilterPill
       href={href}
-      scroll={false}
+      active={active}
       className={
-        "h-9 px-4 inline-flex items-center gap-1.5 rounded-full text-sm font-medium " +
+        "h-9 px-4 rounded-full text-sm font-medium " +
         (active
           ? "bg-navy-950 text-white"
           : "text-navy-700 hover:bg-navy-50")
@@ -401,6 +407,6 @@ function Pill({
       <span className={"text-xs " + (active ? "text-white/55" : "text-navy-400")}>
         {count}
       </span>
-    </Link>
+    </FilterPill>
   );
 }

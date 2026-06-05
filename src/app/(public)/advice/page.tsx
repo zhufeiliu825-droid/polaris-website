@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Clock, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
+import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
 import { prisma } from "@/lib/db";
 
 export const metadata = { title: "Career advice" };
@@ -61,28 +62,30 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
 
       <section className="py-16 bg-paper">
         <Container>
+          <FilteringProvider>
           <div className="flex gap-2 flex-wrap mb-10 border-b border-navy-100 pb-6">
             {CATEGORIES.map((c) => {
               const isActive =
                 c === "All" ? activeCategory == null : c === activeCategory;
               const href = c === "All" ? "/advice" : `/advice?category=${encodeURIComponent(c)}`;
               return (
-                <Link
+                <FilterPill
                   key={c}
                   href={href}
-                  scroll={false}
+                  active={isActive}
                   className={
                     isActive
-                      ? "h-9 px-4 inline-flex items-center rounded-full bg-navy-950 text-white text-sm font-medium"
-                      : "h-9 px-4 inline-flex items-center rounded-full text-sm font-medium text-navy-700 hover:bg-navy-50"
+                      ? "h-9 px-4 rounded-full bg-navy-950 text-white text-sm font-medium"
+                      : "h-9 px-4 rounded-full text-sm font-medium text-navy-700 hover:bg-navy-50"
                   }
                 >
                   {c}
-                </Link>
+                </FilterPill>
               );
             })}
           </div>
 
+          <FilterResults>
           {articles.length === 0 && featured.length === 0 ? (
             <div className="bg-white border border-navy-100 rounded-2xl p-12 text-center">
               <p className="text-navy-600">
@@ -164,6 +167,8 @@ export default async function AdvicePage({ searchParams }: { searchParams: Searc
               </ul>
             </>
           )}
+          </FilterResults>
+          </FilteringProvider>
         </Container>
       </section>
     </>
