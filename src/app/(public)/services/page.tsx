@@ -3,7 +3,12 @@ import { PageHero } from "@/components/page-hero";
 import { ButtonLink } from "@/components/ui/button";
 import { ArrowRight, Check, Download } from "lucide-react";
 
-export const metadata = { title: "Services" };
+export const metadata = {
+  title: "Services",
+  description:
+    "A structured six-stage careers programme — from psychometric assessment and career planning to mock interviews and post-offer support — across three depths of support.",
+  alternates: { canonical: "/services" },
+};
 
 const stages = [
   {

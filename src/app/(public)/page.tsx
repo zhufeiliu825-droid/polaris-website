@@ -35,9 +35,37 @@ const stats = [
   { value: "1:1", label: "personal mentoring" },
 ];
 
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Polaris Consulting",
+  url: "https://polarisconsulting.uk",
+  logo: "https://polarisconsulting.uk/icon.png",
+  description:
+    "Careers mentoring and interview preparation for ambitious students and graduates across the UK.",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: siteConfig.contact.address.line1,
+    addressLocality: "London",
+    postalCode: "WC2R 1EA",
+    addressCountry: "GB",
+  },
+  email: siteConfig.contact.email,
+  telephone: siteConfig.contact.phone,
+  sameAs: [
+    siteConfig.socials.linkedin,
+    siteConfig.socials.instagram,
+    siteConfig.socials.facebook,
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy-950 text-white">
         <div

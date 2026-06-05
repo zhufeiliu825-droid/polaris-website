@@ -58,7 +58,16 @@ export default async function AdminApplicationsPage({
           </h1>
         </div>
         <a
-          href="/admin/applications/export.csv"
+          href={
+            "/admin/applications/export" +
+            (() => {
+              const p = new URLSearchParams();
+              if (status !== "All") p.set("status", status);
+              if (q) p.set("q", q);
+              const s = p.toString();
+              return s ? `?${s}` : "";
+            })()
+          }
           className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-navy-200 bg-white text-sm font-medium hover:bg-navy-50"
         >
           <Download className="h-4 w-4" /> Export CSV

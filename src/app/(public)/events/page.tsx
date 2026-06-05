@@ -6,7 +6,12 @@ import { FilteringProvider, FilterPill, FilterResults } from "@/components/filte
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 
-export const metadata = { title: "Events" };
+export const metadata = {
+  title: "Events",
+  description:
+    "Workshops, networking events and career sessions with recruiters, employers and ambitious graduates — online and in-person across the UK.",
+  alternates: { canonical: "/events" },
+};
 
 /**
  * Two independent filter axes:

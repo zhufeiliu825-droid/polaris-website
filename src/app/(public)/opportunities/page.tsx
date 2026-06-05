@@ -18,7 +18,12 @@ import {
 } from "@/lib/jobs";
 import { reedSectors } from "@/lib/site";
 
-export const metadata = { title: "Opportunities" };
+export const metadata = {
+  title: "Opportunities",
+  description:
+    "A curated, daily-refreshed feed of graduate jobs, internships and schemes across Finance, Consulting, Engineering, Law and more — filter by sector and UK city.",
+  alternates: { canonical: "/opportunities" },
+};
 
 const PAGE_SIZE = 25;
 const ALL_SECTORS_LABEL = "All sectors";

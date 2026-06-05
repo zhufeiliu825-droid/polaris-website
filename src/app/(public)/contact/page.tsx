@@ -4,7 +4,12 @@ import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
 import { siteConfig } from "@/lib/site";
 
-export const metadata = { title: "Contact" };
+export const metadata = {
+  title: "Contact",
+  description:
+    "Get in touch with Polaris Consulting — email, phone, our London office, or start with our short intake form.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return (

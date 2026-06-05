@@ -5,7 +5,12 @@ import { PageHero } from "@/components/page-hero";
 import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
 import { prisma } from "@/lib/db";
 
-export const metadata = { title: "Career advice" };
+export const metadata = {
+  title: "Career advice",
+  description:
+    "Practical career advice for international students and graduates — CVs, interviews, applications, assessment centres and sector-specific guidance.",
+  alternates: { canonical: "/advice" },
+};
 
 const CATEGORIES = [
   "All",
