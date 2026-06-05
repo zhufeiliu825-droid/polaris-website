@@ -248,24 +248,7 @@ async function filterCountsUncached(filter: {
   };
 }
 
-/** Convenience for the admin dashboard tile. */
-async function jobsMetadataUncached() {
-  const [total, latest] = await Promise.all([
-    prisma.job.count({ where: { isActive: true } }),
-    prisma.jobSyncRun.findFirst({
-      where: { ok: true },
-      orderBy: { endedAt: "desc" },
-      select: { endedAt: true },
-    }),
-  ]);
-  return {
-    total,
-    fetchedAt: latest?.endedAt?.toISOString() ?? new Date(0).toISOString(),
-  };
-}
-
 // ── Cached public read paths (tag "jobs", revalidated daily by the cron) ──
 export const listJobs = cached(listJobsUncached, "jobs-list");
 export const getJob = cached(getJobUncached, "jobs-detail");
 export const filterCounts = cached(filterCountsUncached, "jobs-counts");
-export const jobsMetadata = cached(jobsMetadataUncached, "jobs-meta");
