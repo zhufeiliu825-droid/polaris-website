@@ -72,7 +72,7 @@ export default async function JobDetailPage({ params }: PageProps) {
                 </span>
               )}
             </p>
-            <h1 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-light tracking-tight text-navy-950 leading-tight">
+            <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-light tracking-tight text-navy-950 leading-tight">
               {job.jobTitle}
             </h1>
 
@@ -106,7 +106,7 @@ export default async function JobDetailPage({ params }: PageProps) {
               <ButtonLink href={job.jobUrl} variant="primary" size="lg">
                 Apply on Reed <ExternalLink className="h-4 w-4" />
               </ButtonLink>
-              <ButtonLink href="/join" variant="outline" size="lg">
+              <ButtonLink href="/join#form" variant="outline" size="lg">
                 Get help applying <ArrowRight className="h-4 w-4" />
               </ButtonLink>
             </div>

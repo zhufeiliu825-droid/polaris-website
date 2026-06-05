@@ -46,7 +46,7 @@ export default async function AdviceDetailPage({ params }: PageProps) {
             <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
               {article.category}
             </p>
-            <h1 className="mt-3 text-3xl md:text-5xl font-light tracking-tight text-navy-950 leading-tight">
+            <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-light tracking-tight text-navy-950 leading-tight">
               {article.title}
             </h1>
             <p className="mt-5 text-lg text-navy-600 leading-relaxed">

@@ -142,7 +142,7 @@ export default async function OpportunitiesPage({
         subtitle="Curated opportunities for ambitious students and graduates — career opportunities across the UK."
       />
 
-      <section className="bg-paper py-12">
+      <section className="bg-paper py-16">
         <Container>
           <FilteringProvider>
           {/* SEARCH + FILTERS — top bar, matching the Advice page style */}

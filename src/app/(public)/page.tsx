@@ -74,7 +74,7 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-navy-950 via-navy-900/95 to-navy-800/90" aria-hidden="true" />
 
-        <Container className="relative py-24 md:py-32 lg:py-40">
+        <Container className="relative py-20 md:py-28 lg:py-40">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 text-xs uppercase tracking-widest text-sand-200">
               <StarIcon className="h-3.5 w-3.5 text-sand-300" />
@@ -122,7 +122,7 @@ export default function Home() {
       </section>
 
       {/* WHY POLARIS — 4 pillars */}
-      <section className="py-24 md:py-32 bg-paper">
+      <section className="py-20 md:py-28 bg-paper">
         <Container>
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
@@ -141,7 +141,7 @@ export default function Home() {
             {pillars.map((p) => (
               <div
                 key={p.title}
-                className="group relative bg-white border border-navy-100 rounded-2xl p-8 hover:border-navy-300 hover:shadow-lg transition-all"
+                className="group relative bg-white border border-navy-100 rounded-2xl p-8 hover:border-navy-900 hover:shadow-lg transition-all"
               >
                 <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-navy-50 text-navy-900 group-hover:bg-navy-900 group-hover:text-white transition-colors">
                   <p.icon className="h-6 w-6" />
@@ -159,7 +159,7 @@ export default function Home() {
       </section>
 
       {/* THREE CARDS — opportunities / events / advice */}
-      <section className="py-24 md:py-32 bg-sand-50">
+      <section className="py-20 md:py-28 bg-sand-50">
         <Container>
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div className="max-w-2xl">
@@ -202,7 +202,7 @@ export default function Home() {
       </section>
 
       {/* INDUSTRIES */}
-      <section className="py-24 md:py-32 bg-paper">
+      <section className="py-20 md:py-28 bg-paper">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-5">
