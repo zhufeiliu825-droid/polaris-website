@@ -475,7 +475,12 @@ export function JoinForm() {
               />
               <span>
                 I agree to Polaris Consulting&apos;s{" "}
-                <a href="/privacy" className="underline">
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
                   privacy policy
                 </a>{" "}
                 and consent to my data being stored to process my application.
