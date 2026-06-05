@@ -30,28 +30,6 @@ export const degreeLevels = [
   "Other",
 ];
 
-export const yearOfStudy = [
-  "First year",
-  "Second year",
-  "Penultimate year",
-  "Final year",
-  "Graduated",
-  "Postgraduate",
-];
-
-export const academicResults = [
-  "Predicted First / Distinction",
-  "Predicted 2:1 / Merit",
-  "Predicted 2:2",
-  "Achieved First / Distinction",
-  "Achieved 2:1 / Merit",
-  "Achieved 2:2",
-  "GPA 3.7+",
-  "GPA 3.3–3.7",
-  "GPA below 3.3",
-  "Prefer not to say",
-];
-
 export const sectors = [
   "Finance",
   "Accounting",

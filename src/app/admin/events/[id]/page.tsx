@@ -38,7 +38,7 @@ export default async function EditEventPage({
             {event.title}
           </h1>
           <p className="text-navy-600">
-            {event.registrationsCount} people registered · created{" "}
+            Created{" "}
             {event.createdAt.toLocaleDateString("en-GB", { dateStyle: "long" })}
           </p>
         </div>
@@ -68,7 +68,6 @@ export default async function EditEventPage({
           format: event.format === "ONLINE" ? "ONLINE" : "IN_PERSON",
           location: event.location,
           sector: event.sector ?? null,
-          registrationsCount: event.registrationsCount,
           registrationUrl: event.registrationUrl ?? "",
           published: event.published,
           createdAt: event.createdAt.toISOString(),

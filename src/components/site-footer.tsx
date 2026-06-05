@@ -138,19 +138,14 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 text-xs text-navy-300">
-          <p>
-            ©{" "}
-            <Link
-              href="/admin/login"
-              aria-label="Staff sign in"
-              className="hover:text-white"
-              title="Staff"
-            >
-              {new Date().getFullYear()}
-            </Link>{" "}
-            Polaris Consulting Ltd. All rights reserved.
-          </p>
+        <div className="mt-10 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-navy-300">
+          <p>© {new Date().getFullYear()} Polaris Consulting Ltd. All rights reserved.</p>
+          <Link
+            href="/admin/login"
+            className="text-navy-400 hover:text-white inline-flex items-center gap-1.5"
+          >
+            Staff sign in →
+          </Link>
         </div>
       </Container>
     </footer>

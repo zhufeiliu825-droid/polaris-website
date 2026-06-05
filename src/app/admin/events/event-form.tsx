@@ -15,7 +15,6 @@ type EventInitial = {
   format: "ONLINE" | "IN_PERSON";
   location: string;
   sector: string | null;
-  registrationsCount?: number;
   registrationUrl: string;
   published: boolean;
   createdAt?: string;

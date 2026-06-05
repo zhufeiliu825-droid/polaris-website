@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Users, ArrowRight } from "lucide-react";
+import { Plus, Calendar, MapPin, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 
 export const metadata = { title: "Admin · Events" };
@@ -36,7 +36,6 @@ export default async function AdminEventsPage() {
               <th className="text-left font-semibold px-5 py-3">Event</th>
               <th className="text-left font-semibold px-5 py-3">When</th>
               <th className="text-left font-semibold px-5 py-3">Format</th>
-              <th className="text-left font-semibold px-5 py-3">Registrations</th>
               <th className="text-left font-semibold px-5 py-3">Status</th>
               <th className="w-10"></th>
             </tr>
@@ -44,7 +43,7 @@ export default async function AdminEventsPage() {
           <tbody className="divide-y divide-navy-100">
             {events.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-navy-500">
+                <td colSpan={5} className="px-5 py-12 text-center text-navy-500">
                   No events yet —{" "}
                   <Link href="/admin/events/new" className="underline">
                     create your first one
@@ -76,21 +75,8 @@ export default async function AdminEventsPage() {
                     <div className="inline-flex items-center gap-1.5 text-xs">
                       <MapPin className="h-3.5 w-3.5 text-sand-500" />
                       <span className="text-navy-700">
-                        {e.format === "ONLINE"
-                          ? "Online"
-                          : e.format === "IN_PERSON"
-                          ? "In person"
-                          : "Hybrid"}
+                        {e.format === "ONLINE" ? "Online" : "In person"}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="inline-flex items-center gap-1.5 text-xs text-navy-700">
-                      <Users className="h-3.5 w-3.5 text-sand-500" />
-                      {e.registrationsCount}
-                      {e.capacity && (
-                        <span className="text-navy-400"> / {e.capacity}</span>
-                      )}
                     </div>
                   </td>
                   <td className="px-5 py-4">

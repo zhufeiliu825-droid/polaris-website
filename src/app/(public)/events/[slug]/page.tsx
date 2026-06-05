@@ -53,7 +53,7 @@ export default async function EventDetailPage({ params }: PageProps) {
               }
             >
               {isOnline ? <Globe2 className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
-              {isOnline ? "Online" : e.format === "HYBRID" ? "Hybrid" : "In person"}
+              {isOnline ? "Online" : "In person"}
             </span>
             {e.sector && (
               <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-sand-300 font-semibold">

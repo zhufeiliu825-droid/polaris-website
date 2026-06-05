@@ -15,7 +15,7 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  const [apps, events, articles, jobs, admins, contacts, syncs, evRegs] =
+  const [apps, events, articles, jobs, admins, contacts, syncs] =
     await Promise.all([
       prisma.application.count(),
       prisma.event.count(),
@@ -24,7 +24,6 @@ async function main() {
       prisma.adminUser.count(),
       prisma.contactMessage.count(),
       prisma.jobSyncRun.count(),
-      prisma.eventRegistration.count(),
     ]);
   console.log({
     applications: apps,
@@ -34,7 +33,6 @@ async function main() {
     adminUsers: admins,
     contactMessages: contacts,
     jobSyncRuns: syncs,
-    eventRegistrations: evRegs,
   });
   await prisma.$disconnect();
 }

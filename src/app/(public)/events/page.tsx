@@ -155,11 +155,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
                           ) : (
                             <MapPin className="h-3.5 w-3.5" />
                           )}
-                          {isOnline
-                            ? "Online"
-                            : e.format === "HYBRID"
-                              ? "Hybrid"
-                              : "In person"}
+                          {isOnline ? "Online" : "In person"}
                         </span>
                         {e.sector && (
                           <span className="text-xs uppercase tracking-widest text-navy-400 font-semibold">

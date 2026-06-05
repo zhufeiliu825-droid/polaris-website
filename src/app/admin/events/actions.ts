@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import type { EventFormat } from "@prisma/client";
 
 function parseFormat(s: string): EventFormat {
-  if (s === "ONLINE" || s === "IN_PERSON" || s === "HYBRID") return s;
+  if (s === "ONLINE" || s === "IN_PERSON") return s;
   return "ONLINE";
 }
 
