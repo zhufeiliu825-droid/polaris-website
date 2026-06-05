@@ -86,7 +86,7 @@ export default function ContactPage() {
               className="group lg:col-span-7 relative overflow-hidden bg-navy-950 text-white rounded-2xl p-10 md:p-14 flex flex-col justify-between hover:bg-navy-900 transition-colors min-h-[480px]"
             >
               <div
-                className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
+                className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.webp')] bg-cover bg-center"
                 aria-hidden="true"
               />
               <div className="relative">

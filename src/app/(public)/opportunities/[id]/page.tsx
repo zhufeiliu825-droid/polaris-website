@@ -91,7 +91,7 @@ export default async function JobDetailPage({ params }: PageProps) {
               )}
             </div>
 
-            <div className="mt-10 prose prose-lg max-w-none text-navy-700 leading-relaxed">
+            <div className="mt-10 max-w-prose text-navy-700 leading-relaxed">
               <h2 className="text-xl font-medium text-navy-950 tracking-tight">
                 About this opportunity
               </h2>

@@ -189,7 +189,7 @@ function FeaturedCard({
       className="group block h-full bg-navy-950 rounded-3xl p-8 md:p-10 relative overflow-hidden text-white hover:bg-navy-900 transition-colors"
     >
       <div
-        className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
+        className="absolute inset-0 opacity-10 bg-[url('/brand/pattern-dark.webp')] bg-cover bg-center"
         aria-hidden="true"
       />
       <div className="relative flex flex-col h-full">

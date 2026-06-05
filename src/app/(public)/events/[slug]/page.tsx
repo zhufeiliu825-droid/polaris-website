@@ -75,7 +75,8 @@ export default async function EventDetailPage({ params }: PageProps) {
             <div>
               <Markdown
                 markdown={e.body}
-                className="prose-polaris text-navy-800"
+                headingOffset={1}
+                className="text-navy-800 text-base md:text-lg leading-relaxed"
               />
             </div>
 

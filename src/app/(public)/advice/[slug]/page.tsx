@@ -73,7 +73,7 @@ export default async function AdviceDetailPage({ params }: PageProps) {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
             <div className="max-w-3xl">
-              <Markdown markdown={article.body} className="text-navy-800 text-base md:text-lg leading-relaxed" />
+              <Markdown markdown={article.body} headingOffset={1} className="text-navy-800 text-base md:text-lg leading-relaxed" />
 
               {article.tags.length > 0 && (
                 <div className="mt-12 pt-6 border-t border-navy-100 flex flex-wrap items-center gap-2">

@@ -74,7 +74,7 @@ export default function ServicesPage() {
 
       {/* PROGRAMS — anchor for "Enquire" CTAs from elsewhere and the
           landing target for /services itself. */}
-      <section id="programmes" className="py-20 md:py-28 bg-paper scroll-mt-4">
+      <section id="programmes" className="py-20 md:py-28 bg-paper scroll-mt-24">
         <Container>
           <div className="max-w-2xl">
             <p className="text-xs uppercase tracking-widest text-sand-700 font-semibold">
@@ -107,7 +107,7 @@ export default function ServicesPage() {
                     p.accent
                   }
                 >
-                  {p.name} Program
+                  {p.name} Programme
                 </p>
                 <div className="mt-5 flex items-baseline gap-3">
                   <span className="text-4xl font-light text-navy-950">

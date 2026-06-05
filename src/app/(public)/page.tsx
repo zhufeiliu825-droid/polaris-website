@@ -41,7 +41,7 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy-950 text-white">
         <div
-          className="absolute inset-0 opacity-[0.18] bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
+          className="absolute inset-0 opacity-[0.18] bg-[url('/brand/pattern-dark.webp')] bg-cover bg-center"
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-navy-950 via-navy-900/95 to-navy-800/90" aria-hidden="true" />
@@ -52,7 +52,7 @@ export default function Home() {
               <StarIcon className="h-3.5 w-3.5 text-sand-300" />
               {siteConfig.tagline}
             </div>
-            <h1 className="mt-6 text-5xl md:text-6xl lg:text-7xl font-light tracking-tight leading-[1.05]">
+            <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight leading-[1.05]">
               Find your{" "}
               <span className="text-sand-300">North Star</span>
               <br />

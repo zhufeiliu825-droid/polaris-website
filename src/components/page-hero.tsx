@@ -14,7 +14,7 @@ export function PageHero({
   return (
     <section className="relative overflow-hidden bg-navy-950 text-white">
       <div
-        className="absolute inset-0 opacity-[0.12] bg-[url('/brand/pattern-dark.png')] bg-cover bg-center"
+        className="absolute inset-0 opacity-[0.12] bg-[url('/brand/pattern-dark.webp')] bg-cover bg-center"
         aria-hidden="true"
       />
       {/* Fixed min-height + top-anchored content so the eyebrow and h1
@@ -26,9 +26,10 @@ export function PageHero({
             {eyebrow}
           </p>
         )}
-        {/* Single desktop size (no lg: scale-up) so the title stays at a
-            consistent visual weight across pages. */}
-        <h1 className="mt-3 text-4xl md:text-5xl font-light tracking-tight leading-[1.1] max-w-3xl">
+        {/* Start smaller on mobile so long single words (e.g. "opportunities")
+            never overflow a narrow viewport. Single desktop size (no lg:
+            scale-up) keeps the title weight consistent across pages. */}
+        <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-light tracking-tight leading-[1.12] max-w-3xl text-balance">
           {title}
         </h1>
         {subtitle && (
