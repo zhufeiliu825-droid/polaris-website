@@ -29,7 +29,48 @@ export default async function AdminEventsPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-2xl border border-navy-100 overflow-x-auto">
+      {/* Mobile: stacked cards (the table doesn't fit a phone) */}
+      <div className="md:hidden space-y-3">
+        {events.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-navy-100 px-5 py-10 text-center text-sm text-navy-500">
+            No events yet —{" "}
+            <Link href="/admin/events/new" className="underline">
+              create your first one
+            </Link>
+            .
+          </div>
+        ) : (
+          events.map((e) => (
+            <Link
+              key={e.id}
+              href={`/admin/events/${e.id}`}
+              className="block bg-white rounded-2xl border border-navy-100 p-4 active:bg-navy-50"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-medium text-navy-950">{e.title}</p>
+                <PublishedPill published={e.published} />
+              </div>
+              <p className="mt-1 text-xs text-navy-500 line-clamp-2">{e.excerpt}</p>
+              <div className="mt-3 flex items-center gap-x-4 gap-y-1 flex-wrap text-xs text-navy-600">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5 text-sand-500" />
+                  {e.startsAt.toLocaleString("en-GB", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-sand-500" />
+                  {e.format === "ONLINE" ? "Online" : "In person"}
+                </span>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* Desktop: full table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-navy-100 overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-navy-50 text-xs uppercase tracking-widest text-navy-700">
             <tr>

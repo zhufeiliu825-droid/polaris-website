@@ -119,7 +119,62 @@ export default async function AdminApplicationsPage({
         })}
       </div>
 
-      <div className="bg-white rounded-2xl border border-navy-100 overflow-x-auto">
+      {/* Mobile: stacked cards — a 6-column table can't fit a phone, so on
+          small screens each application renders as a tap-through card. */}
+      <div className="md:hidden space-y-3">
+        {rows.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-navy-100 px-5 py-10 text-center text-sm text-navy-500">
+            No applications match.
+          </div>
+        ) : (
+          rows.map((a) => (
+            <Link
+              key={a.id}
+              href={`/admin/applications/${a.id}`}
+              className="block bg-white rounded-2xl border border-navy-100 p-4 active:bg-navy-50"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium text-navy-950 truncate">
+                    {a.firstName} {a.lastName}
+                  </p>
+                  <p className="text-xs text-navy-500 truncate">{a.email}</p>
+                </div>
+                <StatusPill status={a.status} />
+              </div>
+              {(a.university || a.course) && (
+                <div className="mt-3 text-sm text-navy-700">
+                  {a.university && <div className="truncate">{a.university}</div>}
+                  {a.course && (
+                    <div className="text-xs text-navy-500 truncate">{a.course}</div>
+                  )}
+                </div>
+              )}
+              {a.targetSectors.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {a.targetSectors.map((s) => (
+                    <span
+                      key={s}
+                      className="text-[10px] px-2 py-0.5 rounded-full bg-navy-100 text-navy-700"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="mt-3 flex items-center justify-between gap-3 text-xs text-navy-500">
+                <span className="truncate">{a.programme ?? "—"}</span>
+                <span className="shrink-0">
+                  {a.createdAt.toLocaleDateString("en-GB", { dateStyle: "medium" })}
+                </span>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* Desktop: full table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-navy-100 overflow-x-auto">
         <table className="w-full min-w-[820px] text-sm">
           <thead className="bg-navy-50 text-xs uppercase tracking-widest text-navy-700">
             <tr>
