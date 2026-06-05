@@ -37,15 +37,16 @@ async function main() {
   console.log("Seeding Polaris database…\n");
 
   // ─── Admin user ───────────────────────────────────────────────
-  const adminEmail = process.env.ADMIN_EMAIL ?? "staff@polarisconsulting.uk";
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "changeme123";
+  // The `email` column doubles as the login username.
+  const adminEmail = process.env.ADMIN_EMAIL ?? "polarisadmin";
+  const adminPassword = process.env.ADMIN_PASSWORD ?? "12345678";
   const hash = await bcrypt.hash(adminPassword, 10);
   const admin = await prisma.adminUser.upsert({
     where: { email: adminEmail },
     update: {},
     create: {
       email: adminEmail,
-      name: "Polaris Staff",
+      name: "Polaris Admin",
       passwordHash: hash,
       role: "OWNER",
       active: true,

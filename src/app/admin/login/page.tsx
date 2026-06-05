@@ -37,8 +37,8 @@ export default async function AdminLoginPage({ searchParams }: Props) {
         {error && (
           <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error === "invalid"
-              ? "Wrong email or password."
-              : "Please enter your email and password."}
+              ? "Wrong username or password."
+              : "Please enter your username and password."}
           </div>
         )}
 
@@ -46,13 +46,15 @@ export default async function AdminLoginPage({ searchParams }: Props) {
           <input type="hidden" name="next" value={next} />
           <div>
             <label className="block text-sm font-medium text-navy-900 mb-2">
-              Work email
+              Username
             </label>
             <input
-              type="email"
-              name="email"
+              type="text"
+              name="username"
               required
-              autoComplete="email"
+              autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
               className="w-full h-11 px-4 rounded-xl border border-navy-200 focus:outline-none focus:border-navy-900"
             />
           </div>

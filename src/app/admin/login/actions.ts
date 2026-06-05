@@ -6,15 +6,17 @@ import { prisma } from "@/lib/db";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth";
 
 export async function signIn(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  // The AdminUser.email column doubles as the login username (we never
+  // renamed the column). Usernames are case-insensitive.
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const next = String(formData.get("next") ?? "/admin");
 
-  if (!email || !password) {
+  if (!username || !password) {
     redirect(`/admin/login?error=missing&next=${encodeURIComponent(next)}`);
   }
 
-  const user = await prisma.adminUser.findUnique({ where: { email } });
+  const user = await prisma.adminUser.findUnique({ where: { email: username } });
   if (!user || !user.active) {
     redirect(`/admin/login?error=invalid&next=${encodeURIComponent(next)}`);
   }
