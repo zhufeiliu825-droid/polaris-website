@@ -362,9 +362,12 @@ export default async function OpportunitiesPage({
 }
 
 function PillRow({ label, children }: { label: string; children: React.ReactNode }) {
+  // Grid (not flex-wrap) keeps the label column a fixed width so the pills
+  // always start at the same x and the label never gets pushed onto its own
+  // line, regardless of how many pills the row has.
   return (
-    <div className="flex items-baseline gap-x-3 gap-y-2 flex-wrap">
-      <span className="text-xs uppercase tracking-widest text-navy-900 font-semibold w-14 shrink-0">
+    <div className="grid grid-cols-[4.5rem_1fr] gap-x-3 items-start">
+      <span className="text-xs uppercase tracking-widest text-navy-900 font-semibold h-9 inline-flex items-center">
         {label}
       </span>
       <div className="flex gap-2 flex-wrap">{children}</div>

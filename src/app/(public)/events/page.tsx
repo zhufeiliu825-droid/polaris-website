@@ -109,7 +109,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
           {/* FILTER CHIPS — two independent axes, Advice-page pill style */}
           <div className="space-y-2.5 mb-10 border-b border-navy-100 pb-6">
             <ChipRow
-              label="Format"
+              label="Where"
               options={FORMAT_OPTIONS}
               activeKey={activeFormat}
               hrefFor={(k) => hrefFor("format", k)}
@@ -218,8 +218,8 @@ function ChipRow({
   hrefFor: (key: string) => string;
 }) {
   return (
-    <div className="flex items-baseline gap-x-3 gap-y-2 flex-wrap">
-      <span className="text-xs uppercase tracking-widest text-navy-900 font-semibold w-14 shrink-0">
+    <div className="grid grid-cols-[4.5rem_1fr] gap-x-3 items-start">
+      <span className="text-xs uppercase tracking-widest text-navy-900 font-semibold h-9 inline-flex items-center">
         {label}
       </span>
       <div className="flex gap-2 flex-wrap">
