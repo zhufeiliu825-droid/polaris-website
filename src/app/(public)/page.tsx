@@ -31,7 +31,7 @@ const pillars = [
 const stats = [
   { value: "20+", label: "years average mentor experience" },
   { value: "200+", label: "graduates supported" },
-  { value: "8", label: "industries covered" },
+  { value: "6", label: "industries covered" },
   { value: "1:1", label: "personal mentoring" },
 ];
 
@@ -59,9 +59,9 @@ export default function Home() {
               and reach it.
             </h1>
             <p className="mt-8 text-lg md:text-xl text-navy-100 max-w-2xl leading-relaxed">
-              Polaris Consulting helps ambitious graduates secure entry-level
+              Polaris Consulting helps ambitious students and graduates secure
               roles in the world&apos;s most competitive industries — finance,
-              consulting, technology, law and beyond.
+              consulting, engineering, law and beyond.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <ButtonLink href="/join#form" variant="secondary" size="lg">
@@ -150,7 +150,7 @@ export default function Home() {
               icon={Briefcase}
               eyebrow="Live jobs"
               title="Graduate roles & internships"
-              text="Curated opportunities across finance, consulting, tech, law and more — updated daily."
+              text="Curated opportunities across finance, consulting, engineering, law and more — refreshed daily."
               cta="Browse opportunities"
             />
             <FeatureCard
@@ -182,7 +182,7 @@ export default function Home() {
                 Where we work
               </p>
               <h2 className="mt-3 text-4xl md:text-5xl font-light tracking-tight text-navy-950">
-                Eight sectors. One trusted partner.
+                Six sectors. One trusted partner.
               </h2>
               <p className="mt-6 text-lg text-navy-700 leading-relaxed">
                 Our mentors are senior practitioners across the industries our
