@@ -207,8 +207,13 @@ export default async function OpportunitiesPage({
           </div>
 
           <FilterResults>
-          {/* RESULT META */}
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+          {/* RESULT META — also the scroll anchor for pagination, so paging
+              lands at the top of the job list (under the sticky header) rather
+              than jumping back up to the hero. */}
+          <div
+            id="results"
+            className="scroll-mt-24 flex items-center justify-between mb-6 flex-wrap gap-3"
+          >
             <p className="text-sm text-navy-600">
               <strong className="text-navy-950">{fmtCount(total)}</strong>{" "}
               opportunit{total === 1 ? "y" : "ies"}
@@ -323,7 +328,7 @@ export default async function OpportunitiesPage({
             <div className="mt-10 flex justify-center items-center gap-2">
               {page > 1 && (
                 <Link
-                  href={buildHref({ page: page - 1 })}
+                  href={`${buildHref({ page: page - 1 })}#results`}
                   className="px-4 h-10 inline-flex items-center rounded-full border border-navy-200 text-sm font-medium hover:bg-navy-50"
                 >
                   ← Previous
@@ -334,7 +339,7 @@ export default async function OpportunitiesPage({
               </span>
               {page < totalPages && (
                 <Link
-                  href={buildHref({ page: page + 1 })}
+                  href={`${buildHref({ page: page + 1 })}#results`}
                   className="px-4 h-10 inline-flex items-center rounded-full border border-navy-200 text-sm font-medium hover:bg-navy-50"
                 >
                   Next →
