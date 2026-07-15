@@ -163,6 +163,9 @@ export function StatusPill({ status }: { status: string }) {
 
 function timeAgo(date: Date) {
   const mins = Math.floor((Date.now() - date.getTime()) / 60_000);
+  // Covers both a just-submitted application and any clock skew that would
+  // otherwise render a nonsense "0m ago" / negative value.
+  if (mins < 1) return "Just now";
   if (mins < 60) return `${mins}m ago`;
   if (mins < 60 * 24) return `${Math.floor(mins / 60)}h ago`;
   return `${Math.floor(mins / 60 / 24)}d ago`;
