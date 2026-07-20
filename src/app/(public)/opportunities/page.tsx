@@ -1,12 +1,12 @@
 import Link from "next/link";
 import {
-  Search,
   MapPin,
   Calendar,
   Building2,
   ArrowRight,
   Briefcase,
 } from "lucide-react";
+import { JobSearch } from "./job-search";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/page-hero";
 import { FilteringProvider, FilterPill, FilterResults } from "@/components/filtering";
@@ -147,21 +147,7 @@ export default async function OpportunitiesPage({
           <FilteringProvider>
           {/* SEARCH + FILTERS — top bar, matching the Advice page style */}
           <div className="border-b border-navy-100 pb-6 mb-8 space-y-5">
-            <form action="/opportunities" method="get" className="max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
-                <input
-                  name="q"
-                  type="search"
-                  defaultValue={q}
-                  aria-label="Search opportunities by title or employer"
-                  placeholder="Search title or employer…"
-                  className="w-full h-11 pl-9 pr-4 rounded-full border border-navy-200 text-sm field-focus focus:outline-none focus:border-navy-900"
-                />
-              </div>
-              {sector && <input type="hidden" name="sector" value={sector} />}
-              {city && <input type="hidden" name="city" value={city} />}
-            </form>
+            <JobSearch initialQuery={q} sector={sector} city={city} />
 
             <PillRow label="Sector">
               <Pill
@@ -243,6 +229,7 @@ export default async function OpportunitiesPage({
               <Link
                 href="/opportunities"
                 scroll={false}
+                data-clear-filters
                 className="text-xs text-navy-600 hover:text-navy-900 underline underline-offset-4"
               >
                 Clear all filters
